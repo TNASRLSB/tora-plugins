@@ -45,6 +45,34 @@ print('\n'.join(str(p) for p in sorted(set(matches))))
 PY
 ```
 
+### 1b. Astro projects (static sites)
+
+A project is an **Astro** project when it has an `astro.config.*` file
+(`astro.config.mjs` / `.ts` / `.js`) and `astro` in `package.json` dependencies.
+Astro static sites typically do **not** have a `wrangler.toml` — so for Astro,
+relax the step-1 detection: accept a directory with `package.json` +
+`astro.config.*` even without `wrangler.toml`. There is no local D1 for a static
+Astro site, so **skip step 5 (migrations) entirely**.
+
+Astro specifics that matter here:
+
+- **Default dev port is `4321`** (not Vite's 5173). The dev server line looks like
+  `🚀  astro  v... ready` followed by a `Local    http://localhost:4321/` line.
+  The step-7 parser already accepts any port — just don't assume 5173.
+- **Keep the port stable.** When (re)starting the server, force a fixed port and
+  fail instead of sliding to a new one, so an SSH tunnel set up once keeps working.
+  Start with an explicit strict port:
+
+  ```bash
+  setsid bash -lc 'npm run dev -- --port 4321 --strict-port' >> "$LOG" 2>&1 &
+  ```
+
+  If `4321` is taken by an unrelated process, pick one fixed alternative and tell
+  the user the chosen port once — do not let it drift on every restart.
+- **Graphical edits do NOT need a restart.** Astro HMR live-reloads the browser on
+  every save. After editing `.astro` / CSS / component files, the existing preview
+  at the same URL already reflects the change — see step 3, reuse the running server.
+
 ### 2. Prepare stable temp paths
 
 Use the resolved absolute project path to compute stable PID and log paths under `/tmp`:
@@ -67,14 +95,25 @@ print(f'PROJECT=/tmp/tora-build-preview-{h}.project')
 PY
 ```
 
-### 3. Stop any stale or existing preview for this project
+### 3. Reuse the running server if one already exists
 
-Before starting a new server, check the PID file.
+Dev servers (Vite, SvelteKit, Astro) all have hot module reload: once a server
+is running, editing project files updates the browser automatically — there is
+NO need to restart. Restarting also tends to pick a NEW port (the old one is
+briefly in TIME_WAIT), which breaks any SSH tunnel / bookmarked URL the user set up.
 
-- If the PID exists and `kill -0 <pid>` succeeds, stop it first with the same process-group-safe approach used by `/tora-deployer:preview-stop`.
-- If the PID file exists but the process is gone, remove the stale PID file.
+So, before starting anything, check the PID file:
 
-Do not leave multiple dev servers running for the same project.
+- **If the PID exists and `kill -0 <pid>` succeeds → the server is already up.
+  Do NOT restart it.** Read the URL from the existing log file (step 7 parser
+  works on the existing log) and return it. If the user asked for a graphical
+  change, the change is already live via HMR — just tell them to refresh.
+- If the PID file exists but the process is gone, remove the stale PID file and
+  proceed to start a fresh server (steps 4–7).
+- If no PID file exists, proceed to start a fresh server.
+
+Only restart explicitly when the user asks to restart, or when the server died.
+Never start a second dev server for the same project.
 
 ### 4. Install dependencies if needed
 
@@ -211,6 +250,7 @@ Per fermarla: /tora-deployer:preview-stop
 - Do not edit project source files.
 - Do not deploy anything.
 - Do not run remote D1 migrations.
-- Do not assume a fixed Vite port.
+- Do not assume a fixed Vite port (Vite 5173, Astro 4321) — but keep it stable across restarts.
 - Do not leave duplicate preview processes for the same project.
+- Do not restart a healthy running server just to apply a file edit — HMR handles it.
 - Use `/tmp` for PID and log files.
