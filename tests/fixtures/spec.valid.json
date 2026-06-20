@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schemas.toranoai.com/spec/v0.1.json",
+  "version": "0.1",
+  "name": "ticket-system",
+  "description": "A customer support ticket system for tracking requests from external clients and assigning them to operators.",
+  "entities": [
+    {
+      "name": "Customer",
+      "fields": [
+        { "name": "name", "type": "text", "required": true },
+        { "name": "email", "type": "text", "required": true }
+      ]
+    },
+    {
+      "name": "Ticket",
+      "fields": [
+        { "name": "title", "type": "text", "required": true },
+        { "name": "status", "type": "text", "required": true },
+        { "name": "opened_at", "type": "datetime", "required": true },
+        { "name": "customer", "type": "reference", "required": true, "references": "Customer" }
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "name": "admin",
+      "permissions": {
+        "Customer": ["create", "read", "update", "delete"],
+        "Ticket": ["create", "read", "update", "delete"]
+      }
+    },
+    {
+      "name": "operator",
+      "permissions": {
+        "Customer": ["read"],
+        "Ticket": ["create", "read", "update"]
+      }
+    }
+  ],
+  "pages": [
+    { "type": "dashboard", "name": "Dashboard" },
+    { "type": "list", "entity": "Customer" },
+    { "type": "detail", "entity": "Customer" },
+    { "type": "list", "entity": "Ticket" },
+    { "type": "detail", "entity": "Ticket" },
+    { "type": "form", "entity": "Ticket" }
+  ],
+  "auth": {
+    "type": "magic-link",
+    "self_signup": false
+  }
+}

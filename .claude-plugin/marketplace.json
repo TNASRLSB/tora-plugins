@@ -1,0 +1,11 @@
+{
+  "name": "tora-plugins",
+  "owner": { "name": "TORA NO AI SRL", "email": "build@toranoai.com" },
+  "plugins": [
+    {
+      "name": "tora-deployer",
+      "source": "./",
+      "description": "Porta un progetto al deploy su TORA Cloud da Claude Code: siti statici e app gestionali CRUD."
+    }
+  ]
+}

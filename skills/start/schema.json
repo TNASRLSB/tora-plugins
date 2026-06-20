@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.toranoai.com/spec/v0.1.json",
+  "title": "TORA Build project specification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "name", "description", "entities", "roles", "pages", "auth"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "const": "0.1"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,}$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "fields"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9]+$"
+          },
+          "description": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "type"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]*$",
+                  "not": {
+                    "enum": ["id", "created_at"],
+                    "$comment": "Auto-generated columns — a field with the same name would duplicate them (#84)"
+                  }
+                },
+                "type": {
+                  "enum": ["text", "integer", "boolean", "datetime", "reference"]
+                },
+                "required": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "references": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Za-z0-9]+$"
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "type": {
+                        "const": "reference"
+                      }
+                    },
+                    "required": ["type"]
+                  },
+                  "then": {
+                    "required": ["references"]
+                  },
+                  "else": {
+                    "not": {
+                      "required": ["references"]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "permissions"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]*$"
+          },
+          "permissions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "enum": ["create", "read", "update", "delete"]
+              },
+              "uniqueItems": true
+            }
+          }
+        }
+      }
+    },
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "enum": ["list", "detail", "form", "dashboard"]
+          },
+          "entity": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9]+$"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": ["magic-link"]
+        },
+        "self_signup": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+name = "tora-svelte-starter"
+compatibility_date = "2026-05-27"
+compatibility_flags = ["nodejs_compat"]
+main = ".svelte-kit/cloudflare/_worker.js"
+
+[assets]
+directory = ".svelte-kit/output/client"
+binding = "ASSETS"
+
+# The generated project starts as a local preview app. Plugin-E3 will replace
+# deployment-specific values when the TORA Cloud deploy API is wired.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tora-svelte-starter-db"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[vars]
+# HMAC_SECRET must be set via `wrangler secret put HMAC_SECRET` before deploy.
+# The app throws 500 if it is not configured — there is no insecure fallback.
+PUBLIC_URL = "http://localhost:5173"

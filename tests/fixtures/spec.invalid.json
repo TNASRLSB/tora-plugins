@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schemas.toranoai.com/spec/v0.1.json",
+  "version": "0.1",
+  "name": "Bad Name With Spaces",
+  "description": "Too short",
+  "entities": [
+    {
+      "name": "ticket",
+      "fields": [
+        { "name": "title", "type": "email", "required": true }
+      ]
+    }
+  ],
+  "roles": [],
+  "pages": [],
+  "auth": {
+    "type": "password"
+  }
+}

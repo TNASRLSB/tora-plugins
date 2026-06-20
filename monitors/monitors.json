@@ -1,0 +1,19 @@
+[
+  {
+    "name": "tora-build-preview-log",
+    "description": "Optional local watcher metadata for preview logs created by /tora-deployer:preview under /tmp. The preview skill starts npm run dev in the background and parses Vite's Local URL from these logs.",
+    "paths": [
+      "/tmp/tora-build-preview-*.log"
+    ],
+    "events": [
+      {
+        "pattern": "Local:\\s*https?://[^\\s]+",
+        "message": "TORA Build local preview URL is available in the preview log."
+      },
+      {
+        "pattern": "Error|EADDRINUSE|failed|Traceback",
+        "message": "TORA Build local preview log contains a possible startup error."
+      }
+    ]
+  }
+]
