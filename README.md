@@ -114,7 +114,8 @@ di deploy live. Il tool esposto è `deploy_to_tora_cloud`.
 ```text
 plugins/claude-code/tora-deployer/
 ├── .claude-plugin/
-│   └── plugin.json
+│   ├── plugin.json
+│   └── marketplace.json
 ├── skills/
 │   ├── hello/SKILL.md
 │   ├── start/SKILL.md + schema.json
@@ -126,8 +127,6 @@ plugins/claude-code/tora-deployer/
 │   └── deploy-crud/SKILL.md
 ├── templates/
 │   └── svelte-starter/
-├── monitors/
-│   └── monitors.json
 ├── tests/fixtures/
 └── README.md
 ```
