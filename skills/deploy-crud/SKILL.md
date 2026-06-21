@@ -11,10 +11,13 @@ valido v0.1 (prodotto da `tora-deployer:start`).
 ## Processo
 
 ### 1. Genera la BASE (deterministica)
-- Invoca la libreria `@toranoai/codegen` (`buildProjectFiles(spec)`) → file della base:
-  README, wrangler.toml, migrations/0000_init.sql, src/index.js, src/lib/html.js, src/lib/db.js, src/config.js.
-- Scrivi i file generati in una directory di output (es. `<slug>-dist/`).
-- NON modificare a mano i moduli base (index.js/db.js/config.js): sono la fonte di verità del funzionale
+- Esegui il bin bundled per generare i file della base:
+  `node ${CLAUDE_PLUGIN_ROOT}/bin/tora-codegen.mjs <path/spec.json> <slug>-dist/`
+- Leggi SOLO lo stdout JSON: `{ ok: true, files: <count> }`. Tutti i diagnostici vanno su stderr.
+- Se `ok` e' `false`, stampa l'errore e interrompi il flusso.
+- I file generati sono: README.md, wrangler.toml, migrations/0000_init.sql,
+  src/index.js, src/lib/html.js, src/lib/db.js, src/config.js.
+- NON modificare a mano i moduli base (index.js/db.js/config.js): sono la fonte di verita' del funzionale
   (router CRUD, auth, permessi, accesso D1).
 
 ### 2. Genera la UI (Claude)
