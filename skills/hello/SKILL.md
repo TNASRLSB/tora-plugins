@@ -1,16 +1,16 @@
 ---
-description: Mostra la guida introduttiva al plugin TORA Build con il flusso di lavoro e i comandi disponibili
+description: Mostra la guida introduttiva al plugin Tora Deployer con il flusso di lavoro e i comandi disponibili
 ---
 
-# TORA Build — guida introduttiva
+# Tora Deployer — guida introduttiva
 
 Rispondi in italiano con questa guida formattata. Adatta la lingua all'utente se scrive in inglese o altra lingua.
 
 ---
 
-**Benvenuto in TORA Build v0.1.0**
+**Benvenuto in Tora Deployer**
 
-TORA Build porta un progetto fino al deploy su TORA Cloud direttamente da Claude Code. Due strade:
+Tora Deployer porta un progetto fino al deploy su TORA Cloud direttamente da Claude Code. Due strade:
 - **Sito esistente** (Astro, Vite, HTML statico) → lo builda e lo pubblica.
 - **App gestionale da zero** → la genera da una descrizione in linguaggio naturale e la pubblica.
 
