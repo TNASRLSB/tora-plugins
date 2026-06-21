@@ -1,5 +1,5 @@
 ---
-description: Ramo statico di tora:start-deploy. Rileva un progetto sito statico (Astro/Vite/HTML), lo builda localmente, raccoglie l'output e prepara la mappa di file (wrapper Worker servi-asset + asset) per il deploy su TORA Cloud.
+description: Ramo statico di tora:start-deploy. Rileva un progetto sito statico (Astro/Vite/HTML), lo builda localmente, carica l'output tramite l'uploader e avvia il deploy su TORA Cloud.
 ---
 
 # TORA — ramo statico (sito esistente)
@@ -22,23 +22,17 @@ Da `tora-deployer:start-deploy`, quando la cartella contiene un sito statico esi
 - Salta se l'utente ha già una cartella di output pronta.
 - Se la build fallisce → mostra l'errore npm e fermati (non inviare nulla).
 
-### 3. Raccogli l'output → mappa `files`
-- Leggi ricorsivamente la cartella di output. Ogni file → voce in `files` con il path RELATIVO
-  alla cartella di output (es. `index.html`, `assets/app.css`).
-- Aggiungi il **wrapper Worker** come `src/index.js`:
-  ```js
-  export default { async fetch(request, env) { return env.ASSETS.fetch(request); } };
-  ```
-- Risultato: `files` = { "src/index.js": <wrapper>, "index.html": ..., "<asset>": ..., ... }.
-  Il deploy-core distingue automaticamente i moduli (`src/*.js`) dagli asset statici (tutto il resto)
-  e carica gli asset via Workers for Platforms.
+### 3. Carica l'output (NON leggere i file nel contesto)
+Esegui l'uploader, che impacchetta e carica i byte senza farli passare per la chat:
+`node ${CLAUDE_PLUGIN_ROOT}/bin/tora-upload.mjs <output-dir> --project <slug>`
+Leggi SOLO il JSON su stdout: `{ uploadId, ok }`. NON leggere i file di output uno per uno.
 
-### 4. Consegna alla coda comune
+### 4. Deploy
 - `projectName` = nome sito (kebab-case; da package.json `name` o chiesto all'utente).
-- `options` = { needsDb: false }.
-- Prosegui con la coda comune di `tora-deployer:start-deploy` (scelta locale/produzione, invio).
+- Chiama il tool MCP `deploy_to_tora_cloud` con `{ projectName: <slug>, uploadId, options: { needsDb: false } }`.
+- Mostra l'URL pubblico restituito.
 
 ## Vincoli
 - Solo output statico (no SSR nell'MVP).
 - Non modificare i file sorgente dell'utente.
-- File binari grandi vengono caricati come asset (gestiti dal deploy-core via static assets WfP).
+- NON costruire una mappa `files` né leggere i file di output nel contesto: l'uploader gestisce il trasferimento dei byte.

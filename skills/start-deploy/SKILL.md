@@ -23,7 +23,7 @@ build client-side, e scelta tra anteprima locale (gratis) e deploy in produzione
 - Se incerto, fai un'analisi più profonda (leggi config, chiedi conferma) prima di procedere.
 
 ### 3. (Ramo specifico)
-Il ramo produce una **mappa di file** pronta. Dettagli nelle skill dei canali.
+Il ramo gestisce build, caricamento e deploy in autonomia. Dettagli nelle skill dei canali.
 
 ### 4. Coda comune
 1. **Requisiti**: se serve build e mancano dipendenze → `npm install`. Salta se l'output è già pronto.
@@ -31,8 +31,10 @@ Il ramo produce una **mappa di file** pronta. Dettagli nelle skill dei canali.
    - **Anteprima locale** (gratis, non pubblica): avvia l'anteprima locale (skill `tora-deployer:preview`).
      NON chiama il backend, NON consuma deploy.
    - **Produzione** (pubblica il sito): procedi al deploy reale.
-3. **Deploy** (solo produzione): raccogli i file, avvolgi nel wrapper del ramo, e chiama il tool
-   MCP `deploy_to_tora_cloud` con `{ projectName, files, options, environment: "production" }`.
+3. **Deploy** (solo produzione): il ramo specifico esegue l'uploader
+   (`tora-upload.mjs <output-dir> --project <slug>`) e chiama il tool MCP
+   `deploy_to_tora_cloud` con `{ projectName, uploadId, options }`.
+   Questa skill non costruisce né raccoglie file: delega interamente al ramo.
 
 ### 5. Esito
 - Produzione: mostra l'URL live `https://<slug>.toranoai.com`.
@@ -40,7 +42,7 @@ Il ramo produce una **mappa di file** pronta. Dettagli nelle skill dei canali.
 - Errore: riporta in chiaro il messaggio (vedi sotto).
 
 ## Errori comuni
-- `files` vuoto o senza moduli `src/*.js` → "il progetto non ha prodotto file deployabili: verifica la build".
+- L'uploader non ha prodotto un `uploadId` / la build non ha generato output deployabile → "verifica che la build sia completata correttamente prima del deploy".
 - 429 (quota) → "troppi deploy, riprova più tardi".
 - 502 → "deploy non riuscito lato server, riprova".
 - backend `not_configured` → "il MCP è raggiungibile ma il deploy backend non è ancora attivo".
