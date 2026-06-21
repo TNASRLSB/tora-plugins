@@ -24,12 +24,16 @@ valido v0.1 (prodotto da `tora-deployer:start`).
 - **NON includere** il `wrangler.toml` generato dalla libreria nella directory di output: il deploy-core
   imposta il proprio metadata.
 
-### 3. Carica l'output (NON leggere i file nel contesto)
-Esegui l'uploader, che impacchetta e carica i byte senza farli passare per la chat:
-`node ${CLAUDE_PLUGIN_ROOT}/bin/tora-upload.mjs <output-dir> --project <slug>`
-Leggi SOLO il JSON su stdout: `{ uploadId, ok }`. NON leggere i file di output uno per uno.
+### 3. Prepara la sessione di upload
+Chiama il tool MCP `prepare_upload` con `{ projectName: <slug> }`. Ottieni `{ uploadId, uploadToken }`.
+NON mostrare l'uploadToken all'utente; passalo solo all'uploader nel passo 4.
 
-### 4. Deploy
+### 4. Carica l'output (NON leggere i file nel contesto)
+Esegui l'uploader, che impacchetta e carica i byte senza farli passare per la chat:
+`node ${CLAUDE_PLUGIN_ROOT}/bin/tora-upload.mjs <output-dir> --project <slug> --upload-token <uploadToken>`
+Leggi SOLO il JSON su stdout: `{ uploadId, ok }`. Nessun login del browser è richiesto.
+
+### 5. Deploy
 - `projectName` = `spec.name` (già kebab-case validato).
 - Chiama il tool MCP `deploy_to_tora_cloud` con:
   ```

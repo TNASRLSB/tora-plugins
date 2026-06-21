@@ -22,15 +22,18 @@ Da `tora-deployer:start-deploy`, quando la cartella contiene un sito statico esi
 - Salta se l'utente ha già una cartella di output pronta.
 - Se la build fallisce → mostra l'errore npm e fermati (non inviare nulla).
 
-### 3. Carica l'output (NON leggere i file nel contesto)
-Esegui l'uploader, che impacchetta e carica i byte senza farli passare per la chat:
-`node ${CLAUDE_PLUGIN_ROOT}/bin/tora-upload.mjs <output-dir> --project <slug>`
-Leggi SOLO il JSON su stdout: `{ uploadId, ok }`. NON leggere i file di output uno per uno.
+### 3. Prepara la sessione di upload
+Chiama il tool MCP `prepare_upload` con `{ projectName: <slug> }`. Ottieni `{ uploadId, uploadToken }`.
+NON mostrare l'uploadToken all'utente; passalo solo all'uploader nel passo 4.
 
-### 4. Deploy
-- `projectName` = nome sito (kebab-case; da package.json `name` o chiesto all'utente).
-- Chiama il tool MCP `deploy_to_tora_cloud` con `{ projectName: <slug>, uploadId, options: { needsDb: false } }`.
-- Mostra l'URL pubblico restituito.
+### 4. Carica l'output (NON leggere i file nel contesto)
+Esegui l'uploader, che impacchetta e carica i byte senza farli passare per la chat:
+`node ${CLAUDE_PLUGIN_ROOT}/bin/tora-upload.mjs <output-dir> --project <slug> --upload-token <uploadToken>`
+Leggi SOLO il JSON su stdout: `{ uploadId, ok }`. Nessun login del browser è richiesto.
+
+### 5. Deploy
+Chiama il tool MCP `deploy_to_tora_cloud` con `{ projectName: <slug>, uploadId, options: { needsDb: false } }`.
+Mostra l'URL pubblico restituito.
 
 ## Vincoli
 - Solo output statico (no SSR nell'MVP).

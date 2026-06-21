@@ -49,7 +49,7 @@ Ferma il server di sviluppo avviato con `/tora-deployer:preview`.
 
 **Autenticazione**
 
-Il deploy in produzione richiede un account TORA. Al primo deploy Claude Code aprirà il login nel browser (OAuth): nessun token da incollare a mano. L'anteprima locale invece è gratuita e non richiede login.
+Il deploy in produzione richiede un account TORA. Effettui il login **una sola volta** quando Claude Code si collega al server TORA (OAuth nel browser; in ambienti senza interfaccia grafica incolli l'URL di callback in chat). Da quel momento i deploy successivi non richiedono altri login. L'anteprima locale è gratuita e non richiede account.
 
 ---
 
