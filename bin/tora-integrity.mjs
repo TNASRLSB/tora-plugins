@@ -97,10 +97,14 @@ var require_equal = __commonJS({
   }
 });
 
-// src/cli.ts
+// src/cli-integrity.ts
+import { readFileSync as readFileSync2 } from "node:fs";
 import process from "node:process";
-import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+
+// src/integrity.ts
+import { createHash } from "node:crypto";
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join, relative, sep } from "node:path";
 
 // ../shared/src/spec-validator.generated.js
 var import_ucs2length = __toESM(require_ucs2length(), 1);
@@ -1595,67 +1599,75 @@ function buildProjectFiles(spec) {
   };
 }
 
-// src/cli.ts
-async function main(argv) {
-  const [specPath, outDir] = argv;
-  if (!specPath || !outDir) {
-    process.stderr.write(
-      "Usage: node tora-codegen.mjs <spec.json-path> <out-dir>\n"
-    );
-    process.stdout.write(
-      JSON.stringify({ ok: false, error: "missing arguments" }) + "\n"
-    );
-    process.exit(1);
-  }
-  let spec;
-  try {
-    const raw = readFileSync(specPath, "utf8");
-    spec = JSON.parse(raw);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`[tora-codegen] Failed to read spec: ${msg}
-`);
-    process.stdout.write(
-      JSON.stringify({ ok: false, error: `read spec: ${msg.slice(0, 120)}` }) + "\n"
-    );
-    process.exit(1);
-  }
-  let files;
-  try {
-    files = buildProjectFiles(spec);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`[tora-codegen] buildProjectFiles failed: ${msg}
-`);
-    process.stdout.write(
-      JSON.stringify({ ok: false, error: `codegen: ${msg.slice(0, 120)}` }) + "\n"
-    );
-    process.exit(1);
-  }
-  try {
-    for (const [relPath, content] of Object.entries(files)) {
-      const absPath = join(outDir, relPath);
-      mkdirSync(dirname(absPath), { recursive: true });
-      writeFileSync(absPath, content, "utf8");
-      process.stderr.write(`[tora-codegen] wrote ${relPath}
-`);
-    }
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`[tora-codegen] Error writing output: ${msg}
-`);
-    process.stdout.write(
-      JSON.stringify({ ok: false, error: `write: ${msg.slice(0, 120)}` }) + "\n"
-    );
-    process.exit(1);
-  }
-  process.stdout.write(
-    JSON.stringify({ ok: true, files: Object.keys(files).length }) + "\n"
-  );
+// src/integrity.ts
+var MOTORE_FILES = [
+  "src/index.js",
+  "src/lib/auth.js",
+  "src/lib/db.js",
+  "src/lib/ui-kit.js",
+  "src/lib/shell.js",
+  "src/config.js",
+  "migrations/0000_init.sql"
+];
+function sha256(content) {
+  return createHash("sha256").update(content, "utf8").digest("hex");
 }
-if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith("tora-codegen.mjs")) {
-  main(process.argv.slice(2));
+function listSrcFiles(projectDir) {
+  const root = join(projectDir, "src");
+  const files = [];
+  const walk = (directory) => {
+    for (const name of readdirSync(directory)) {
+      const absolutePath = join(directory, name);
+      if (statSync(absolutePath).isDirectory()) walk(absolutePath);
+      else files.push(absolutePath);
+    }
+  };
+  try {
+    walk(root);
+  } catch {
+  }
+  return files;
+}
+function checkIntegrity(spec, projectDir) {
+  const expected = buildProjectFiles(spec);
+  const mismatches = [];
+  for (const relativePath of MOTORE_FILES) {
+    let actual;
+    try {
+      actual = readFileSync(join(projectDir, relativePath.split("/").join(sep)), "utf8");
+    } catch {
+      mismatches.push(relativePath);
+      continue;
+    }
+    if (sha256(actual) !== sha256(expected[relativePath] ?? "")) {
+      mismatches.push(relativePath);
+    }
+  }
+  const bypassFound = [];
+  for (const absolutePath of listSrcFiles(projectDir)) {
+    const content = readFileSync(absolutePath, "utf8");
+    if (/DEV_AUTH_BYPASS\s*=\s*["']1["']/.test(content)) {
+      bypassFound.push(relative(projectDir, absolutePath));
+    }
+  }
+  return { ok: mismatches.length === 0, mismatches, bypassFound };
+}
+
+// src/cli-integrity.ts
+function runIntegrityCli(argv) {
+  const [specPath, projectDir] = argv;
+  if (!specPath || !projectDir) {
+    process.stderr.write("Usage: tora-integrity <spec.json> <project-dir>\n");
+    return { ok: false, mismatches: ["__usage__"], bypassFound: [] };
+  }
+  const spec = JSON.parse(readFileSync2(specPath, "utf8"));
+  return checkIntegrity(spec, projectDir);
+}
+if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith("tora-integrity.mjs")) {
+  const result = runIntegrityCli(process.argv.slice(2));
+  process.stdout.write(JSON.stringify(result) + "\n");
+  process.exit(result.ok && result.bypassFound.length === 0 ? 0 : 1);
 }
 export {
-  main
+  runIntegrityCli
 };

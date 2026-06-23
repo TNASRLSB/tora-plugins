@@ -50,9 +50,8 @@ L'**anteprima locale** è gratuita e non richiede login.
 | `/tora-deployer:hello` | Guida introduttiva — conferma che il plugin è caricato |
 | `/tora-deployer:start-deploy` | **Punto d'ingresso unico**: check → smistamento → anteprima o deploy |
 | `/tora-deployer:start` | Intervista → scrive `./spec.json` (app CRUD nuove) |
-| `/tora-deployer:generate` | Legge `spec.json` → genera l'app SvelteKit completa |
 | `/tora-deployer:deploy-static` | Ramo statico: builda un sito esistente e prepara i file |
-| `/tora-deployer:deploy-crud` | Ramo CRUD: genera la base da spec e prepara i file |
+| `/tora-deployer:deploy-crud` | Ramo CRUD: genera un Worker da spec, Claude cura solo `src/views.js`, guardia di integrità, deploy |
 | `/tora-deployer:preview` | Avvia il server di sviluppo locale, restituisce l'URL |
 | `/tora-deployer:preview-stop` | Ferma il server di sviluppo |
 
@@ -64,20 +63,27 @@ L'**anteprima locale** è gratuita e non richiede login.
                               → anteprima locale (gratis) oppure deploy in produzione
 ```
 
-In produzione il tool MCP `deploy_to_tora_cloud` riceve `{ projectName, files, options, environment }`
-(la **build è già fatta client-side**), pubblica un User Worker e restituisce
-`https://<slug>.toranoai.com`.
+In produzione l'output viene caricato dall'uploader (`tora-upload.mjs`) e il tool MCP
+`deploy_to_tora_cloud` riceve `{ projectName, uploadId, options }`, pubblica un User Worker e
+restituisce `https://<slug>.toranoai.com`.
 
 ## App CRUD generata
 
-Il ramo CRUD include:
+Il ramo CRUD genera, in modo deterministico (`bin/tora-codegen.mjs`), un Cloudflare Worker
+**senza build né dipendenze npm** (solo API Web standard + binding D1):
 
-- SvelteKit + TypeScript + Cloudflare Workers adapter
-- Drizzle ORM con D1 (SQLite)
-- Magic-link auth (Resend o fallback `console.log` in dev)
-- RBAC dai ruoli dello spec (`canAccess()`)
-- Rotte CRUD (list, create, detail/edit) per ogni entità
-- Migration SQL in `migrations/0001_init.sql`
+- auth **email + password** con sessioni in D1 (token random, in DB solo lo SHA-256; nessun segreto)
+- ruoli/permessi dallo spec (`canAccess()`), con ruoli `is_admin`/`is_default` espliciti
+- rotte CRUD (lista, nuovo, dettaglio/modifica, elimina) per ogni entità
+- area amministrazione integrata: cambio password (`/account/password`) e gestione utenti (`/admin/users`)
+- migration SQL in `migrations/0000_init.sql` (tabelle `users`/`sessions` + entità)
+
+**Confine motore/UI**: i file motore (`src/index.js`, `src/lib/*.js`, `src/config.js`, migration)
+sono la fonte di verità del comportamento e non vanno toccati; Claude personalizza SOLO `src/views.js`.
+Una guardia (`bin/tora-integrity.mjs`) confronta gli hash dei file motore prima dell'upload e blocca
+il deploy se sono stati modificati. In anteprima locale il login è aggirato (`DEV_AUTH_BYPASS`);
+in produzione deploy-core ignora il `wrangler.toml` caricato, quindi il bypass non può arrivare online.
+L'admin di produzione è seedato al deploy da `bin/tora-seed-admin.mjs`.
 
 ## Requirements spec
 
@@ -94,14 +100,20 @@ plugins/claude-code/tora-deployer/tests/fixtures/spec.valid.json
 plugins/claude-code/tora-deployer/tests/fixtures/spec.invalid.json
 ```
 
-Tipi di campo: `text`, `integer`, `boolean`, `datetime`, `reference`. Auth: `magic-link`.
+Tipi di campo: `text`, `integer`, `boolean`, `datetime`, `reference`. I ruoli marcano
+esattamente un `is_admin` e un `is_default`; `auth.admin_email` è opzionale. (`auth.type`
+resta `magic-link` per validare lo schema, ma il runtime è email+password.)
 
-## Starter template
+## Binari del generatore
 
-`/tora-deployer:generate` copia da:
+Il ramo CRUD usa i bin bundlati in `bin/` (generati da `packages/codegen` con
+`npm run build:plugin-bin`):
 
 ```text
-plugins/claude-code/tora-deployer/templates/svelte-starter
+bin/tora-codegen.mjs      genera il Worker dallo spec
+bin/tora-integrity.mjs    guardia: hash dei file motore + scan bypass
+bin/tora-seed-admin.mjs   crea l'INSERT dell'admin (hash compatibile con auth.js)
+bin/tora-upload.mjs       impacchetta e carica l'output su R2
 ```
 
 ## Integrazione MCP
@@ -119,14 +131,16 @@ plugins/claude-code/tora-deployer/
 ├── skills/
 │   ├── hello/SKILL.md
 │   ├── start/SKILL.md + schema.json
-│   ├── generate/SKILL.md
 │   ├── preview/SKILL.md
 │   ├── preview-stop/SKILL.md
 │   ├── start-deploy/SKILL.md
 │   ├── deploy-static/SKILL.md
 │   └── deploy-crud/SKILL.md
-├── templates/
-│   └── svelte-starter/
+├── bin/
+│   ├── tora-codegen.mjs
+│   ├── tora-integrity.mjs
+│   ├── tora-seed-admin.mjs
+│   └── tora-upload.mjs
 ├── tests/fixtures/
 └── README.md
 ```

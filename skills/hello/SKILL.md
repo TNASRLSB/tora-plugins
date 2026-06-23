@@ -1,59 +1,67 @@
 ---
-description: Mostra la guida introduttiva al plugin Tora Deployer con il flusso di lavoro e i comandi disponibili
+description: Use when the user wants an introduction to the Tora Deployer plugin — its workflow and available commands.
 ---
 
-# Tora Deployer — guida introduttiva
+# Tora Deployer — getting started
 
-Rispondi in italiano con questa guida formattata. Adatta la lingua all'utente se scrive in inglese o altra lingua.
-
----
-
-**Benvenuto in Tora Deployer**
-
-Tora Deployer porta un progetto fino al deploy su TORA Cloud direttamente da Claude Code. Due strade:
-- **Sito esistente** (Astro, Vite, HTML statico) → lo builda e lo pubblica.
-- **App gestionale da zero** → la genera da una descrizione in linguaggio naturale e la pubblica.
-
-In entrambi i casi puoi prima vedere un'**anteprima locale gratuita**, poi decidere se pubblicare.
+Respond with this guide. Adapt the language to the user (reply in their language).
 
 ---
 
-**Per iniziare: un solo comando**
+**Welcome to Tora Deployer**
+
+Tora Deployer takes a project all the way to deploy on TORA Cloud, straight from Claude Code.
+Two paths:
+- **Existing site** (Astro, Vite, static HTML) → builds and publishes it.
+- **New admin/CRUD app from scratch** → generates it from a plain-language description
+  (database, email+password auth, roles/permissions, CRUD, and an admin area) and publishes it.
+
+In both cases you can first see a **free local preview**, then decide whether to publish.
+
+---
+
+**To start: one command**
 
 ```
 /tora-deployer:start-deploy
 ```
 
-Ti fa un check leggero del progetto, capisce di che tipo è, e ti guida fino all'anteprima o al deploy. Da lì in poi non devi ricordare gli altri comandi: la procedura li orchestra per te.
+It does a lightweight check of the project, figures out which path it is, and guides you to
+preview or deploy. From there you don't need to remember the other commands — the procedure
+orchestrates them for you.
 
 ---
 
-**Comandi disponibili**
+**Available commands**
 
 `/tora-deployer:start-deploy`
-Punto d'ingresso unico. Rileva il tipo di progetto, fa un check a basso consumo, e ti porta all'anteprima locale o al deploy in produzione.
+Single entry point. Detects the project type, does a low-cost check, and takes you to local
+preview or production deploy.
 
 `/tora-deployer:start`
-Solo per app gestionali nuove: chiacchierata guidata per definire l'app. Alla fine viene scritto `spec.json`. Di norma lo invoca `start-deploy` per te.
-
-`/tora-deployer:generate`
-Legge `spec.json` e genera l'app SvelteKit completa (database, auth, pagine CRUD, permessi). Di norma usato dal ramo CRUD.
+New admin apps only: a guided interview to define the app. It writes `spec.json`. Normally
+invoked by `start-deploy` for you.
 
 `/tora-deployer:preview`
-Avvia il server di sviluppo locale (gratis, non pubblica) e restituisce l'URL.
+Starts the local preview (free, not public) and returns the URL.
 
 `/tora-deployer:preview-stop`
-Ferma il server di sviluppo avviato con `/tora-deployer:preview`.
+Stops the local preview server started by `/tora-deployer:preview`.
+
+(The CRUD branch — generating and deploying the app — is handled by `deploy-crud`, which
+`start-deploy` runs for you.)
 
 ---
 
-**Autenticazione**
+**Authentication**
 
-Il deploy in produzione richiede un account TORA. Effettui il login **una sola volta** quando Claude Code si collega al server TORA (OAuth nel browser; in ambienti senza interfaccia grafica incolli l'URL di callback in chat). Da quel momento i deploy successivi non richiedono altri login. L'anteprima locale è gratuita e non richiede account.
+Production deploy requires a TORA account. You log in **once**, when Claude Code connects to
+the TORA server (OAuth in the browser; in headless environments you paste the callback URL in
+chat). After that, further deploys need no extra login. Local preview is free and needs no account.
 
 ---
 
-**Per iniziare subito:**
+**To start now:**
 
 ```
 /tora-deployer:start-deploy

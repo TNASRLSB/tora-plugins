@@ -1,53 +1,37 @@
 ---
-description: Procedura guidata per deployare un progetto su TORA Cloud. Rileva il tipo di progetto, fa un check leggero, builda, e pubblica (o avvia un'anteprima locale). Punto d'ingresso unico per i canali statico e CRUD.
+description: Use when the user wants to publish or put a project online on TORA Cloud, or build an app from scratch, and it is not yet clear whether it is an existing static site or a new CRUD admin app. Single entry point.
 ---
 
-# TORA — start-deploy (procedura guidata)
+# TORA — start-deploy (entry point and routing)
 
-## Scopo
-Guidare l'utente dal progetto al deploy su `<slug>.toranoai.com`, con un check a basso consumo,
-build client-side, e scelta tra anteprima locale (gratis) e deploy in produzione.
+## When this applies
+The user says things like "publish this site", "put it online on TORA", "I want an
+admin app for…", "build me something to manage…" and has not already started a
+specific branch.
 
-## Flusso
+## Process
 
-### 1. Check leggero (basso consumo)
-- Leggi i file `.md` del progetto (README, ecc.) per capire di cosa si tratta.
-- Fai 1-2 domande mirate all'utente. L'utente può rispondere "non so, fai tu".
-- NON leggere tutto il codice ora: solo quanto serve a smistare.
+### 1. Lightweight check (low token cost)
+- Read only the obvious `.md`/config files (README, package.json, astro.config) to
+  understand what this is.
+- Ask 1–2 targeted questions. The user may answer "I don't know, you decide."
+- Do NOT read the whole codebase now: this step only exists to route.
+- Ask the user in their own language.
 
-### 2. Smistamento
-- Se la cartella contiene un progetto esistente (package.json / sito / astro.config) →
-  **ramo statico** (skill `tora-deployer:deploy-static`).
-- Se l'utente vuole costruire un'app gestionale da zero → **ramo CRUD**
-  (skill `tora-deployer:start` per lo spec, poi `tora-deployer:deploy-crud`).
-- Se incerto, fai un'analisi più profonda (leggi config, chiedi conferma) prima di procedere.
+### 2. Routing
+- **Existing static site/project** (package.json with a build, astro.config, or just
+  `.html` files) → static branch: skill `tora-deployer:deploy-static`.
+- **CRUD admin app to build from scratch** (the user describes entities/roles and has
+  no code yet) → CRUD branch: first `tora-deployer:start` (gathers requirements into
+  `spec.json`), then `tora-deployer:deploy-crud` (generate, customize the UI, publish).
+- If unsure, ask one clarifying question before choosing. Do not guess.
 
-### 3. (Ramo specifico)
-Il ramo gestisce build, caricamento e deploy in autonomia. Dettagli nelle skill dei canali.
+### 3. Hand off to the branch
+The chosen branch handles generation/build, local preview, and deploy on its own.
+This skill does not generate, build, or publish — it only routes.
 
-### 4. Coda comune
-1. **Requisiti**: se serve build e mancano dipendenze → `npm install`. Salta se l'output è già pronto.
-2. **Scelta ambiente** — chiedi all'utente:
-   - **Anteprima locale** (gratis, non pubblica): avvia l'anteprima locale (skill `tora-deployer:preview`).
-     NON chiama il backend, NON consuma deploy.
-   - **Produzione** (pubblica il sito): procedi al deploy reale.
-3. **Deploy** (solo produzione): il ramo specifico esegue l'uploader
-   (`tora-upload.mjs <output-dir> --project <slug>`) e chiama il tool MCP
-   `deploy_to_tora_cloud` con `{ projectName, uploadId, options }`.
-   Questa skill non costruisce né raccoglie file: delega interamente al ramo.
-
-### 5. Esito
-- Produzione: mostra l'URL live `https://<slug>.toranoai.com`.
-- Anteprima: mostra l'URL locale e ricorda come fermarla.
-- Errore: riporta in chiaro il messaggio (vedi sotto).
-
-## Errori comuni
-- L'uploader non ha prodotto un `uploadId` / la build non ha generato output deployabile → "verifica che la build sia completata correttamente prima del deploy".
-- 429 (quota) → "troppi deploy, riprova più tardi".
-- 502 → "deploy non riuscito lato server, riprova".
-- backend `not_configured` → "il MCP è raggiungibile ma il deploy backend non è ancora attivo".
-
-## Vincoli
-- Non pubblicare nulla in modalità anteprima locale (non consuma deploy).
-- Non leggere l'intero codice nel check iniziale (basso consumo).
-- I rami statico/CRUD sono definiti nelle rispettive skill; questa skill li orchestra.
+## Constraints
+- There are ONLY two branches: static (`deploy-static`) and CRUD
+  (`start` → `deploy-crud`). No other CRUD flow exists.
+- Do not read the entire codebase during the initial check (low cost).
+- When in doubt between the two branches, ask — wrong routing wastes time.

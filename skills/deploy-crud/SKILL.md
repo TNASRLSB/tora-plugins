@@ -1,59 +1,108 @@
 ---
-description: Ramo CRUD di tora:start-deploy. Da un spec.json valido genera la base funzionale con la libreria @toranoai/codegen (deterministica), poi Claude genera lo strato UI sopra le API, carica l'output tramite l'uploader e avvia il deploy su TORA Cloud.
+description: Use when there is a valid spec.json for a CRUD admin app and the user wants to generate, customize, and deploy it on TORA Cloud. Reached after tora-deployer:start.
 ---
 
-# TORA — ramo CRUD (app da spec.json)
+# TORA — deploy-crud (generate, customize UI, deploy)
 
-## Quando si attiva
-Da `tora:start-deploy`, quando l'utente vuole costruire un'app gestionale. Richiede un `spec.json`
-valido v0.1 (prodotto da `tora-deployer:start`).
+## When this applies
+A valid `./spec.json` exists (from `tora-deployer:start`) and the user wants the working
+app. The generator produces a Cloudflare Worker with email+password auth, roles/permissions,
+CRUD for every entity, and a built-in admin area (change password at `/account/password`;
+user management at `/admin/users` for the admin role). You customize only the look, then deploy.
 
-## Processo
+## The motore / UI boundary (read first)
+The generator splits the app into two zones:
 
-### 1. Genera la BASE (deterministica)
-- Esegui il bin bundled per generare i file della base:
-  `node ${CLAUDE_PLUGIN_ROOT}/bin/tora-codegen.mjs <path/spec.json> <slug>-dist/`
-- Leggi SOLO lo stdout JSON: `{ ok: true, files: <count> }`. Tutti i diagnostici vanno su stderr.
-- Se `ok` e' `false`, stampa l'errore e interrompi il flusso.
-- I file generati sono: README.md, wrangler.toml, migrations/0000_init.sql,
-  src/index.js, src/lib/html.js, src/lib/db.js, src/config.js.
-- NON modificare a mano i moduli base (index.js/db.js/config.js): sono la fonte di verita' del funzionale
-  (router CRUD, auth, permessi, accesso D1).
+- **MOTORE — never edit.** `src/index.js`, `src/lib/auth.js`, `src/lib/db.js`,
+  `src/lib/ui-kit.js`, `src/lib/shell.js`, `src/config.js`, `migrations/0000_init.sql`.
+  These are the router, auth, permissions, DB access — the source of truth for behavior.
+- **UI — yours to rewrite.** `src/views.js` ONLY. CSS in `renderStyles()`, markup in the
+  `render*` functions.
 
-### 2. Genera la UI (Claude)
-- Sopra le API CRUD della base, genera lo strato di presentazione (pagine/markup/stile) nella stessa directory di output.
-- Confine RIGIDO: la UI non tocca dati/logica/auth/permessi (quelli sono nella base).
-- Per l'MVP la UI può essere funzionale e semplice.
-- **NON includere** il `wrangler.toml` generato dalla libreria nella directory di output: il deploy-core
-  imposta il proprio metadata.
+A deploy-time guard (step 4) re-generates the base and compares hashes: if any motore file
+changed, the deploy is blocked.
 
-### 3. Prepara la sessione di upload
-Chiama il tool MCP `prepare_upload` con `{ projectName: <slug> }`. Ottieni `{ uploadId, uploadToken }`.
-NON mostrare l'uploadToken all'utente; passalo solo all'uploader nel passo 4.
+## Process
 
-### 4. Carica l'output (NON leggere i file nel contesto)
-Esegui l'uploader, che impacchetta e carica i byte senza farli passare per la chat:
-`node ${CLAUDE_PLUGIN_ROOT}/bin/tora-upload.mjs <output-dir> --project <slug> --upload-token <uploadToken>`
-Leggi SOLO il JSON su stdout: `{ uploadId, ok }`. Nessun login del browser è richiesto.
+### 1. Generate the base (deterministic)
+```
+node ${CLAUDE_PLUGIN_ROOT}/bin/tora-codegen.mjs <path/to/spec.json> <slug>-dist/
+```
+Read ONLY the stdout JSON `{ ok, files }`. If `ok` is `false`, show the error and stop.
 
-### 5. Deploy
-- `projectName` = `spec.name` (già kebab-case validato).
-- Chiama il tool MCP `deploy_to_tora_cloud` con:
-  ```
-  {
-    projectName: <slug>,
-    uploadId,
-    options: {
-      needsDb: true,
-      migrationSql: <contenuto di <slug>-dist/migrations/0000_init.sql>,
-      specJson: <spec.json serializzato>
-    }
+### 2. Customize the UI — `src/views.js` ONLY
+- Change CSS (`renderStyles()`) and markup (`render*`) freely.
+- For form fields, ALWAYS use the `fieldInput()` / `formAction()` helpers from
+  `src/lib/ui-kit.js`: they emit the `name`/URLs the router expects. Around them, any
+  markup/style you like.
+- Do NOT edit any motore file (see boundary) to "fix" behavior or shared helpers. Behavior
+  lives in the motore and is verified at step 4.
+
+### 3. Local preview (recommended)
+Run `tora-deployer:preview`. Login is already bypassed locally — you are admin with no
+sign-in. Do NOT debug auth locally; real login only exists in production.
+
+### 4. Integrity guard (MANDATORY, before upload)
+```
+node ${CLAUDE_PLUGIN_ROOT}/bin/tora-integrity.mjs <path/to/spec.json> <slug>-dist/
+```
+Read the stdout JSON `{ ok, mismatches, bypassFound }`. Proceed ONLY if `ok` is true AND
+`bypassFound` is empty. Otherwise STOP: list the changed motore files / bypass location,
+restore them by regenerating the base (step 1) into a clean dir and re-applying only your
+`views.js` changes, then re-run the guard. Never deploy on a failed guard.
+
+### 5. Prepare the upload session
+Call MCP tool `prepare_upload` with `{ projectName: <slug> }` → `{ uploadId, uploadToken }`.
+Never show the uploadToken to the user; pass it only to the uploader.
+
+### 6. Upload the output (do NOT read files into context)
+```
+node ${CLAUDE_PLUGIN_ROOT}/bin/tora-upload.mjs <slug>-dist/ --project <slug> --upload-token <uploadToken>
+```
+Read ONLY the stdout JSON `{ uploadId, ok }`. The archive includes `wrangler.toml`, but
+deploy-core ignores it and builds its own Worker metadata (only the D1 binding) — so the
+local-only `DEV_AUTH_BYPASS` in `wrangler.toml` can never reach production. (The guard at
+step 4 is what guarantees no bypass logic is baked into the shipped JS modules.)
+
+### 7. Seed the administrator account
+Production login is real email+password, and the admin must already exist. Ask the user for
+the administrator email, then create the admin seed using the role marked `is_admin` in
+`spec.json` (call it `<ADMIN_ROLE>`):
+```
+node ${CLAUDE_PLUGIN_ROOT}/bin/tora-seed-admin.mjs <admin-email> <ADMIN_ROLE>
+```
+Read the stdout JSON `{ ok, password, sql }`. Keep `sql` for step 8. Give the `password`
+(and email) to the user — it is the admin's first login; they can change it at
+`/account/password` once inside.
+
+### 8. Deploy
+Build the migration to apply in production by appending the admin seed to the schema:
+`migrationSql` = contents of `<slug>-dist/migrations/0000_init.sql` + a newline + the `sql`
+from step 7. Do NOT modify the on-disk migration file (that would have failed the guard) —
+append only here, in memory.
+
+Call MCP tool `deploy_to_tora_cloud`:
+```
+{
+  projectName: <slug>,
+  uploadId,
+  options: {
+    needsDb: true,
+    migrationSql: <schema + "\n" + admin seed sql>,
+    specJson: <serialized spec.json>
   }
-  ```
-- Mostra l'URL pubblico restituito.
+}
+```
+Show the returned public URL, plus the admin email + password from step 7.
 
-## Vincoli
-- La base la genera la LIBRERIA, non Claude a mano (evita il caos del vecchio flusso a due generatori).
-- Claude genera SOLO la UI.
-- NON costruire una mappa `files` né leggere i file di output nel contesto: l'uploader gestisce il trasferimento dei byte.
-- Non includere il `wrangler.toml` dell'artefatto tra i file caricati.
+## Red flags — STOP
+- About to edit `index.js`/`auth.js`/`db.js`/`ui-kit.js`/`shell.js`/`config.js`/migration → don't; only `views.js`.
+- Tempted to skip the integrity guard "because it's probably fine" → run it; it is mandatory.
+- Writing the admin seed INTO `migrations/0000_init.sql` on disk → don't; append only to the in-memory `migrationSql` at step 8, after the guard.
+- Debugging the login during local preview → stop; it is bypassed by design.
+
+## Constraints
+- The base is generated by the library; you only customize `src/views.js`.
+- Do not build a `files` map or read output files into context — the uploader moves the bytes.
+- The integrity guard (step 4) runs before every upload, no exceptions.
+- The deployed app already includes change-password and admin user management — do not build them.

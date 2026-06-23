@@ -1,183 +1,84 @@
 ---
-description: Gather product requirements from the user through structured clarifying questions and produce a spec.json ready for code generation. Use when the user wants to start a new TORA Build project.
+description: Use when the user wants to build a new CRUD admin app from scratch on TORA and the requirements (entities, fields, roles, permissions) are not yet captured as a spec.json. Produces ./spec.json only — no code, no deploy.
 ---
 
-# TORA Build — requirements gathering
+# TORA — start (requirements → spec.json)
+
+## When this applies
+Reached from `tora-deployer:start-deploy` (CRUD branch), or when the user directly
+asks to build an admin/management app and there is no `spec.json` yet.
 
 ## Goal
+Interview the user and write a valid `./spec.json` describing what to build. This
+skill captures requirements ONLY. Do not write code, choose libraries, or deploy.
 
-Interview the user to capture enough information to generate a working SvelteKit app on TORA Cloud. Produce `spec.json` in the current working directory, valid against `skills/start/schema.json`.
+Ask the user in their own language. Keep it to ~12 user turns; if you hit the limit,
+summarize, state explicit assumptions, and write `spec.json`.
 
-This skill captures product requirements only. Do not implement code, choose libraries, ask about frameworks, or deploy anything.
+## What to capture
 
-## Conversation budget
+1. **Domain & purpose** — one question:
+   > What do you want to build? e.g. a stationery inventory for the office, a CRM for
+   > my gym, an internal ticketing system.
 
-Use at most 12 total user-assistant turns for requirements gathering. If the conversation reaches the limit, summarize the best available requirements, make explicit assumptions, and write `spec.json`.
+2. **Entities & fields** — the core "things" the app stores. For each entity, capture
+   its fields. Each field has a `type` from: `text`, `integer`, `boolean`, `datetime`,
+   `reference` (a link to another entity). Mark fields that are mandatory as `required`.
+   Suggest sensible defaults if the user is unsure.
 
-## Process
+3. **Roles & permissions** — who uses the app and what each role may do per entity
+   (subset of `create`, `read`, `update`, `delete`).
 
-### 1. Domain and purpose
+4. **Admin & default role (EXPLICIT)** — you MUST mark, with no guessing:
+   - exactly one role as `is_admin: true` (the administrator),
+   - exactly one role as `is_default: true` (assigned to new sign-ups).
+   They can be the same role only if there is a single role.
 
-Ask one question:
+5. **Admin email (optional)** — ask who the administrator is. If given, set
+   `auth.admin_email`. Explain: the app uses **email + password** login; the person who
+   signs up with the admin email becomes admin, everyone else gets the default role.
+   (Do not promise magic links or external email services.)
 
-> Cosa vuoi costruire? Esempi: un sistema ticket per i miei clienti, un CRM per la mia palestra, un portale interno per la mia azienda.
+## spec.json shape
 
-If the user already described the project, summarize your understanding and continue instead of asking again.
-
-### 2. Core entities
-
-Ask one or two questions:
-
-> Quali sono le entità principali della tua app? Es. per un sistema ticket: Ticket, Cliente, Operatore. Per un CRM palestra: Iscritto, Abbonamento, Lezione.
-
-If the user is unsure, propose a minimal default set based on the domain and ask for confirmation.
-
-### 3. Fields and permissions per entity
-
-For each entity, ask only what is necessary:
-
-- Quali campi ha l'entità `<Entity>`? Posso suggerire default ragionevoli se vuoi.
-- Chi può creare, leggere, modificare o cancellare istanze di `<Entity>`?
-
-Normalize field types to only these five base types:
-
-- `text`
-- `integer`
-- `boolean`
-- `datetime`
-- `reference`
-
-Do not emit refined types such as `email`, `url`, `money`, `enum`, or `file` in `spec.json`. Represent them as `text` and preserve the semantic intent in field names or descriptions if needed.
-
-### 4. Auth model
-
-Ask one question:
-
-> Chi accede all'app? Solo te, un piccolo team, oppure clienti esterni con email separata?
-
-For MVP, always output:
+Write `./spec.json` in the current directory. Minimal valid example:
 
 ```json
 {
-  "type": "magic-link"
-}
-```
-
-Set `self_signup` to `true` only when external users/customers can register themselves.
-
-### 5. UI pages
-
-Ask one question:
-
-> Quali pagine principali immagini? Se vuoi, posso proporre list view, detail view, form di creazione e dashboard.
-
-Ensure at least one page exists for each main entity unless the user explicitly says it is only background data.
-
-### 6. Completeness check
-
-Before writing `spec.json`, verify internally:
-
-- at least 1 entity exists
-- every entity has at least 2 fields
-- at least 1 role exists
-- permissions mention valid entity names
-- at least 1 page exists
-- `reference` fields include `references`
-- non-reference fields do not include `references`
-- no field is named `id` or `created_at` — these columns are auto-generated on every
-  table; if the user's domain needs such a field, pick a distinct name (e.g. `opened_at`)
-- names are normalized:
-  - app `name`: kebab-case
-  - entity names: PascalCase
-  - field names: snake_case
-  - role names: lowercase kebab/snake case
-
-If a requirement is missing, ask one final focused question. If the user cannot answer, choose a safe default and record the assumption in the final summary, not in `spec.json`.
-
-## Output file
-
-Write `spec.json` in the current working directory using the Write tool.
-
-Use this JSON shape:
-
-```json
-{
-  "$schema": "https://schemas.toranoai.com/spec/v0.1.json",
   "version": "0.1",
-  "name": "ticket-system",
-  "description": "A short product description in one or two sentences.",
+  "name": "cancelleria",
+  "description": "Internal app to manage office stationery",
   "entities": [
-    {
-      "name": "Ticket",
-      "fields": [
-        { "name": "title", "type": "text", "required": true },
-        { "name": "status", "type": "text", "required": true },
-        { "name": "created_at", "type": "datetime", "required": true },
-        { "name": "customer", "type": "reference", "required": true, "references": "Customer" }
-      ]
-    }
+    { "name": "Articolo", "fields": [
+      { "name": "nome", "type": "text", "required": true },
+      { "name": "quantita", "type": "integer" },
+      { "name": "fornitore", "type": "reference", "references": "Fornitore" }
+    ] },
+    { "name": "Fornitore", "fields": [
+      { "name": "nome", "type": "text", "required": true }
+    ] }
   ],
   "roles": [
-    {
-      "name": "admin",
-      "permissions": {
-        "Ticket": ["create", "read", "update", "delete"]
-      }
-    }
+    { "name": "admin", "permissions": { "Articolo": ["create","read","update","delete"], "Fornitore": ["create","read","update","delete"] }, "is_admin": true, "is_default": false },
+    { "name": "dipendente", "permissions": { "Articolo": ["read"] }, "is_admin": false, "is_default": true }
   ],
-  "pages": [
-    { "type": "dashboard", "name": "Dashboard" },
-    { "type": "list", "entity": "Ticket" },
-    { "type": "detail", "entity": "Ticket" },
-    { "type": "form", "entity": "Ticket" }
-  ],
-  "auth": {
-    "type": "magic-link",
-    "self_signup": false
-  }
+  "pages": [{ "type": "dashboard" }],
+  "auth": { "type": "magic-link", "admin_email": "capo@azienda.it" }
 }
 ```
 
+Naming: `name` is kebab-case (`^[a-z][a-z0-9-]{2,}$`); entity names are identifiers
+(letters/digits/underscore); field names are identifiers and must not be `id` or
+`created_at` (reserved). The generated app auto-creates a dashboard plus list/detail/
+form pages per entity, so `pages` only needs `[{ "type": "dashboard" }]`.
+
 ## After writing
-
-After `spec.json` is written:
-
-### 1. Consult the skill catalog
-
-Read `skills/CATALOG.md` from the plugin directory. Check for skills with:
-- `when: planning` — suggest them if the user seems uncertain about the design
-- `when: ui` — mention them if `spec.pages` contains list, detail, or form pages
-
-For each relevant external skill, mention it briefly. Do not fetch or activate it yet — just inform the user it exists and ask if they want to use it during generation.
-
-Example:
-
-```text
-Ho notato che il tuo progetto ha pagine UI. Vuoi applicare uno stile visivo durante la generazione?
-Posso usare la skill **ui-ux-pro-max** (67 stili, palette colori, font) per rendere l'app più curata.
-```
-
-### 2. Final reply
-
-Reply with:
-
-```text
-Spec pronto in ./spec.json. Esegui /tora-deployer:generate per procedere alla generazione del codice.
-```
-
-Then include a short human-readable summary:
-
-- app name
-- entities
-- roles
-- pages
-- assumptions made, if any
-- skill suggestions, if any
+Validate that exactly one role has `is_admin: true` and exactly one has
+`is_default: true`. Then tell the user the spec is ready and the next step is
+`tora-deployer:deploy-crud`.
 
 ## Constraints
-
-- Do not ask about implementation technologies.
-- Do not create any files other than `spec.json`.
-- Do not run shell commands unless the user explicitly asks you to validate the file after writing it.
-- Do not continue to code generation; that belongs to `/tora-deployer:generate`.
-- If the user asks for code generation in the same turn, still finish only `spec.json` and tell them to run `/tora-deployer:generate` next.
+- Output `./spec.json` only. Do not generate code, install anything, or deploy.
+- Do not interview about visual design or pages — that is handled later.
+- `auth.type` is fixed to `"magic-link"` to satisfy the schema; the runtime login is
+  email + password regardless. Do not surface "magic link" to the user.

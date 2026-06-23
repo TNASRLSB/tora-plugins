@@ -27,14 +27,18 @@
       "permissions": {
         "Customer": ["create", "read", "update", "delete"],
         "Ticket": ["create", "read", "update", "delete"]
-      }
+      },
+      "is_admin": true,
+      "is_default": false
     },
     {
       "name": "operator",
       "permissions": {
         "Customer": ["read"],
         "Ticket": ["create", "read", "update"]
-      }
+      },
+      "is_admin": false,
+      "is_default": true
     }
   ],
   "pages": [

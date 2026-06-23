@@ -1,256 +1,78 @@
 ---
-description: Start a local preview for a generated TORA Build project. Detects package.json and wrangler.toml, installs dependencies when needed, can apply local D1 migrations, launches npm run dev in the background, and reports the Vite Local URL.
+description: Use when the user wants to preview a generated TORA CRUD app locally before deploying — running it on their machine to click through it. The app is a Cloudflare Worker with D1; login is bypassed locally.
 ---
 
-# TORA Build — local preview
+# TORA — preview (local Worker preview)
 
-## Goal
+## When this applies
+A generated CRUD project directory — it contains `wrangler.toml` and `src/index.js`
+(and `src/views.js`, `migrations/`). NOT the plugin repo itself. The generated app has
+no `package.json` and no npm dependencies.
 
-Start a generated TORA Build project locally and return the preview URL. This skill is for generated projects, not for this plugin repository itself.
-
-A valid generated project is a directory containing both:
-
-- `package.json`
-- `wrangler.toml`
+## Read first — two facts that save hours
+- It is a **Cloudflare Worker with a D1 binding**, so it runs with **`wrangler dev`**,
+  NOT `vite` / `npm run dev`. There is nothing to `npm install`.
+- **Login is already bypassed locally.** `wrangler.toml` sets `[vars] DEV_AUTH_BYPASS = "1"`,
+  so every request is authenticated as admin and the login page never appears. This is by
+  design. Do NOT debug authentication during local preview.
 
 ## Process
 
-### 1. Find the generated project directory
+### 1. Find the project directory
+Use the dir containing both `wrangler.toml` and `src/index.js`. If run from a parent,
+search immediate children, then depth 2; if multiple match, ask which one.
 
-Use the Bash tool to detect the project directory before running any install, migration, or server command.
+### 2. Compute stable /tmp paths
+From the resolved project path, derive a sha1 and use:
+`/tmp/tora-preview-<sha1>.pid`, `.log`, `.project`. Stable paths keep one server per project.
 
-Detection order:
+### 3. Reuse a running server if present
+If the PID file exists and `kill -0 <pid>` succeeds, the server is already up: read the URL
+from the log and return it. `wrangler dev` watches files and reloads on save, so edits to
+`src/views.js` are picked up automatically — do NOT restart for a UI change. Restarting
+also tends to pick a new port, breaking any SSH tunnel/bookmark.
 
-1. If the current working directory contains both `package.json` and `wrangler.toml`, use it.
-2. Otherwise search immediate child directories, then depth 2, for directories containing both files.
-3. If exactly one match exists, use it.
-4. If multiple matches exist, ask the user which directory to preview.
-5. If no match exists, stop and say that `/tora-deployer:preview` must be run from a generated project directory or its parent.
-
-Suggested discovery command:
-
+### 4. Apply local D1 migrations
 ```bash
-python3 - <<'PY'
-from pathlib import Path
-root = Path.cwd()
-matches = []
-for depth in (0, 1, 2):
-    candidates = [root] if depth == 0 else [p for p in root.glob('/'.join(['*'] * depth)) if p.is_dir()]
-    for p in candidates:
-        if (p / 'package.json').is_file() and (p / 'wrangler.toml').is_file():
-            matches.append(p.resolve())
-    if matches:
-        break
-print('\n'.join(str(p) for p in sorted(set(matches))))
-PY
+npx wrangler d1 execute DB --local --file=./migrations/0000_init.sql
 ```
+`DB` is the binding name. Always `--local`. Never run remote migrations from preview.
 
-### 1b. Astro projects (static sites)
-
-A project is an **Astro** project when it has an `astro.config.*` file
-(`astro.config.mjs` / `.ts` / `.js`) and `astro` in `package.json` dependencies.
-Astro static sites typically do **not** have a `wrangler.toml` — so for Astro,
-relax the step-1 detection: accept a directory with `package.json` +
-`astro.config.*` even without `wrangler.toml`. There is no local D1 for a static
-Astro site, so **skip step 5 (migrations) entirely**.
-
-Astro specifics that matter here:
-
-- **Default dev port is `4321`** (not Vite's 5173). The dev server line looks like
-  `🚀  astro  v... ready` followed by a `Local    http://localhost:4321/` line.
-  The step-7 parser already accepts any port — just don't assume 5173.
-- **Keep the port stable.** When (re)starting the server, force a fixed port and
-  fail instead of sliding to a new one, so an SSH tunnel set up once keeps working.
-  Start with an explicit strict port:
-
-  ```bash
-  setsid bash -lc 'npm run dev -- --port 4321 --strict-port' >> "$LOG" 2>&1 &
-  ```
-
-  If `4321` is taken by an unrelated process, pick one fixed alternative and tell
-  the user the chosen port once — do not let it drift on every restart.
-- **Graphical edits do NOT need a restart.** Astro HMR live-reloads the browser on
-  every save. After editing `.astro` / CSS / component files, the existing preview
-  at the same URL already reflects the change — see step 3, reuse the running server.
-
-### 2. Prepare stable temp paths
-
-Use the resolved absolute project path to compute stable PID and log paths under `/tmp`:
-
-- PID file: `/tmp/tora-build-preview-<sha1>.pid`
-- Log file: `/tmp/tora-build-preview-<sha1>.log`
-- Project marker: `/tmp/tora-build-preview-<sha1>.project`
-
-Suggested command, run from the selected project directory:
-
-```bash
-python3 - <<'PY'
-import hashlib
-from pathlib import Path
-project = str(Path.cwd().resolve())
-h = hashlib.sha1(project.encode()).hexdigest()[:12]
-print(f'PID=/tmp/tora-build-preview-{h}.pid')
-print(f'LOG=/tmp/tora-build-preview-{h}.log')
-print(f'PROJECT=/tmp/tora-build-preview-{h}.project')
-PY
-```
-
-### 3. Reuse the running server if one already exists
-
-Dev servers (Vite, SvelteKit, Astro) all have hot module reload: once a server
-is running, editing project files updates the browser automatically — there is
-NO need to restart. Restarting also tends to pick a NEW port (the old one is
-briefly in TIME_WAIT), which breaks any SSH tunnel / bookmarked URL the user set up.
-
-So, before starting anything, check the PID file:
-
-- **If the PID exists and `kill -0 <pid>` succeeds → the server is already up.
-  Do NOT restart it.** Read the URL from the existing log file (step 7 parser
-  works on the existing log) and return it. If the user asked for a graphical
-  change, the change is already live via HMR — just tell them to refresh.
-- If the PID file exists but the process is gone, remove the stale PID file and
-  proceed to start a fresh server (steps 4–7).
-- If no PID file exists, proceed to start a fresh server.
-
-Only restart explicitly when the user asks to restart, or when the server died.
-Never start a second dev server for the same project.
-
-### 4. Install dependencies if needed
-
-Run `npm install` only when needed:
-
-- `node_modules/` is missing, or
-- `package-lock.json` is missing while `package.json` exists.
-
-If `node_modules/` and the lockfile are already present, skip install.
-
-Use:
-
-```bash
-npm install
-```
-
-If install fails, stop and show the relevant npm error.
-
-### 5. Optionally apply local D1 migrations
-
-Detect local D1 support by checking for both:
-
-- `migrations/` directory with migration files
-- `wrangler.toml` containing a D1 database declaration (`[[d1_databases]]` or `d1_databases`)
-
-If D1 migrations are detected:
-
-- If the user explicitly asked to apply migrations, run them.
-- If the user explicitly asked to skip migrations, skip them.
-- Otherwise ask one short confirmation question before applying migrations locally.
-
-When applying migrations, prefer the database name from `wrangler.toml` (`database_name = "..."`). If no database name can be detected, use the first D1 binding name. Run with `--local` only.
-
-Suggested migration command shape:
-
-```bash
-npx wrangler d1 migrations apply <database-name-or-binding> --local
-```
-
-Do not run remote migrations from this skill. Never omit `--local`.
-
-### 6. Start the dev server in the background
-
-Start the server with `npm run dev` in the selected project directory.
-
-Requirements:
-
-- Run it in the background.
-- Redirect stdout/stderr to the `/tmp` log file.
-- Write the process PID to the `/tmp` PID file.
-- Write the resolved project path to the `/tmp` project marker.
-- Do not block the Claude Code session with a foreground Vite/Wrangler process.
-
-Preferred command pattern:
-
+### 5. Start wrangler dev in the background (robust launch)
 ```bash
 : > "$LOG"
 printf '%s\n' "$PWD" > "$PROJECT"
-setsid bash -lc 'npm run dev' >> "$LOG" 2>&1 &
+nohup npx wrangler dev --port 8787 >> "$LOG" 2>&1 < /dev/null &
 printf '%s\n' "$!" > "$PID"
 ```
+Why this exact shape (lessons from a real session that lost hours):
+- `nohup … < /dev/null &` — `wrangler dev` exits immediately if it inherits an interactive
+  stdin; redirect stdin from `/dev/null` and detach with `nohup`.
+- Do NOT pass flags that don't exist (e.g. `--no-open`).
+- `--port 8787` keeps the port stable so an SSH tunnel set up once keeps working. If 8787
+  is taken, pick ONE fixed alternative and tell the user the port once — don't let it drift.
 
-Pitfall: Vite may choose a different port if the default port is busy. Do not assume `5173`; parse the actual URL from the log.
+### 6. Wait for and parse the URL
+Poll the log up to ~40s for `Ready on http://localhost:<port>` (or any
+`http://localhost:<port>` / `127.0.0.1:<port>`). If none appears: show the last ~80 log
+lines and whether the PID is alive.
 
-### 7. Wait for and parse the Vite Local URL
+### 7. Final response
+Report, in the user's language:
+- project dir, preview URL, PID file, log file
+- **"Login is already bypassed: you are admin, no sign-in needed."**
+- If remote (e.g. over SSH), the tunnel hint:
+  `ssh -N -L 8787:localhost:8787 user@host` → open `http://localhost:8787/`
+- Stop it with `/tora-deployer:preview-stop`.
 
-Poll the log for up to 30 seconds. Parse the first local URL printed by Vite, typically from a line like:
-
-```text
-Local:   http://localhost:5173/
-```
-
-Accept either `localhost` or `127.0.0.1`, and accept any port.
-
-Suggested parser:
-
-```bash
-python3 - "$LOG" <<'PY'
-import re, sys, time
-from pathlib import Path
-
-ANSI = re.compile(r'\x1b\[[0-9;]*[mGKHF]')
-
-log = Path(sys.argv[1])
-# Match "Local:   http://localhost:5173/" after stripping ANSI codes
-patterns = [
-    re.compile(r'Local:\s*(https?://[^\s]+)'),
-    re.compile(r'(https?://(?:localhost|127\.0\.0\.1):\d+/?)'),
-]
-deadline = time.time() + 30
-while time.time() < deadline:
-    raw = log.read_text(errors='replace') if log.exists() else ''
-    text = ANSI.sub('', raw)
-    for pattern in patterns:
-        m = pattern.search(text)
-        if m:
-            print(m.group(1))
-            raise SystemExit(0)
-    time.sleep(1)
-raise SystemExit(1)
-PY
-```
-
-If no URL is found after 30 seconds:
-
-1. Check whether the PID is still running.
-2. Show the last 80 lines of the log.
-3. Explain that the server may still be starting or may have failed.
-4. Tell the user where the log and PID files are.
-
-### 8. Final response
-
-When successful, reply in Italian or the user's language with:
-
-- project directory
-- preview URL
-- PID file path
-- log file path
-- reminder to stop it with `/tora-deployer:preview-stop`
-
-Example:
-
-```text
-Preview locale avviata.
-Progetto: /path/to/app
-URL: http://localhost:5174/
-PID: /tmp/tora-build-preview-abc123def456.pid
-Log: /tmp/tora-build-preview-abc123def456.log
-Per fermarla: /tora-deployer:preview-stop
-```
+## Red flags — STOP
+- About to debug the login / "fix" auth because you see (or expect) a login page locally
+  → STOP. It is bypassed by design; real login only exists in production.
+- About to run `vite` / `npm run dev` / `npm install` → wrong: this is a Worker, use `wrangler dev`.
+- About to restart a healthy server to apply a `views.js` edit → don't; wrangler reloads on save.
+- `wrangler dev` died instantly → you forgot `nohup … < /dev/null`; relaunch as in step 5.
 
 ## Constraints
-
-- Do not edit project source files.
-- Do not deploy anything.
-- Do not run remote D1 migrations.
-- Do not assume a fixed Vite port (Vite 5173, Astro 4321) — but keep it stable across restarts.
-- Do not leave duplicate preview processes for the same project.
-- Do not restart a healthy running server just to apply a file edit — HMR handles it.
-- Use `/tmp` for PID and log files.
+- Do not edit project source files from this skill (preview only).
+- Do not deploy, and never run remote D1 migrations.
+- One dev server per project; use `/tmp` for PID/log.

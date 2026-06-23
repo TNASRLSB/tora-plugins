@@ -33,21 +33,12 @@ description: Requirements gathering via guided interview. Writes spec.json.
 source: built-in
 ```
 
-### tora-deployer:generate
-```yaml
-id: tora-deployer:generate
-category: core
-when: always
-description: Generates full SvelteKit + D1 app from spec.json.
-source: built-in
-```
-
 ### tora-deployer:preview
 ```yaml
 id: tora-deployer:preview
 category: core
 when: always
-description: Starts local dev server and returns URL.
+description: Starts the local Worker preview (wrangler dev + local D1) and returns the URL.
 source: built-in
 ```
 
@@ -90,9 +81,9 @@ id: tora-deployer:deploy-crud
 category: core
 when: always
 description: >
-  Ramo CRUD di start-deploy. Da uno spec.json valido genera la base funzionale con la
-  libreria @toranoai/codegen (deterministica), poi Claude genera lo strato UI, e prepara
-  la mappa di file per il deploy.
+  CRUD branch of start-deploy. From a valid spec.json it generates a complete Worker app
+  with @toranoai/codegen (auth, roles/permissions, CRUD, admin area); Claude customizes only
+  src/views.js; an integrity guard verifies the motore files, then it deploys to TORA Cloud.
 source: built-in
 ```
 
@@ -126,7 +117,7 @@ description: >
   Advanced UI/UX design intelligence with 67 styles (Glassmorphism, Brutalism, Bento Grid...),
   161 color palettes, 57 font pairings, 25 chart types, and 99 UX guidelines.
   Activate when the user wants a polished, styled UI instead of the default plain HTML/CSS.
-  Apply during /tora-deployer:generate to style the generated Svelte components.
+  Apply during /tora-deployer:deploy-crud to style src/views.js (CSS in renderStyles, markup in render*).
 source: https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/SKILL.md
 requires: []
 ```
