@@ -2,7 +2,7 @@
 description: Stop a local preview started by /tora-deployer:preview. Finds the generated project, reads /tmp PID files, stops the background npm run dev process, and removes stale state.
 ---
 
-# TORA Build — stop local preview
+# Tora-Deployer — stop local preview
 
 ## Goal
 
@@ -105,7 +105,7 @@ Log conservato: /tmp/tora-build-preview-abc123def456.log
 If no preview is running:
 
 ```text
-Nessuna preview locale TORA Build in esecuzione. Ho rimosso eventuali PID file stale.
+Nessuna preview locale Tora-Deployer in esecuzione. Ho rimosso eventuali PID file stale.
 ```
 
 ## Constraints

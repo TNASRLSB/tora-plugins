@@ -63,7 +63,7 @@ Write `./spec.json` in the current directory. Minimal valid example:
     { "name": "dipendente", "permissions": { "Articolo": ["read"] }, "is_admin": false, "is_default": true }
   ],
   "pages": [{ "type": "dashboard" }],
-  "auth": { "type": "magic-link", "admin_email": "capo@azienda.it" }
+  "auth": { "type": "password", "admin_email": "capo@azienda.it" }
 }
 ```
 
@@ -80,5 +80,4 @@ Validate that exactly one role has `is_admin: true` and exactly one has
 ## Constraints
 - Output `./spec.json` only. Do not generate code, install anything, or deploy.
 - Do not interview about visual design or pages — that is handled later.
-- `auth.type` is fixed to `"magic-link"` to satisfy the schema; the runtime login is
-  email + password regardless. Do not surface "magic link" to the user.
+- `auth.type` is `"password"` (the only supported mode): login is email + password.

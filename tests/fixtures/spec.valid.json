@@ -50,7 +50,7 @@
     { "type": "form", "entity": "Ticket" }
   ],
   "auth": {
-    "type": "magic-link",
+    "type": "password",
     "self_signup": false
   }
 }

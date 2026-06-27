@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.toranoai.com/spec/v0.1.json",
-  "title": "TORA Build project specification",
+  "title": "Tora-Deployer project specification",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "name", "description", "entities", "roles", "pages", "auth"],
@@ -140,7 +140,7 @@
       "required": ["type"],
       "properties": {
         "type": {
-          "enum": ["magic-link"]
+          "enum": ["password"]
         },
         "self_signup": {
           "type": "boolean"

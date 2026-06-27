@@ -1,6 +1,6 @@
-# TORA Build Skill Catalog
+# Tora-Deployer Skill Catalog
 
-This catalog lists all skills available to the TORA Build orchestrator.
+This catalog lists all skills available to the Tora-Deployer orchestrator.
 
 **How to use this catalog:**
 Before starting or generating a project, read this file and activate any skills marked as relevant for the current `spec.json`. For each external skill, fetch the URL in `source` to load the full instructions, then apply them in the current task.

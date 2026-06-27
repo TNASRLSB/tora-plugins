@@ -105,7 +105,7 @@ import { dirname, join } from "node:path";
 // ../shared/src/spec-validator.generated.js
 var import_ucs2length = __toESM(require_ucs2length(), 1);
 var import_equal = __toESM(require_equal(), 1);
-var schema31 = { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://schemas.toranoai.com/spec/v0.1.json", "title": "TORA Build project specification", "type": "object", "additionalProperties": false, "required": ["version", "name", "description", "entities", "roles", "pages", "auth"], "properties": { "$schema": { "type": "string" }, "version": { "const": "0.1" }, "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,}$" }, "description": { "type": "string", "minLength": 10 }, "entities": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["name", "fields"], "properties": { "name": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]+$" }, "description": { "type": "string" }, "fields": { "type": "array", "minItems": 2, "items": { "type": "object", "additionalProperties": false, "required": ["name", "type"], "properties": { "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "not": { "enum": ["id", "created_at"], "$comment": "Auto-generated columns \u2014 a field with the same name would duplicate them (#84)" } }, "type": { "enum": ["text", "integer", "boolean", "datetime", "reference"] }, "required": { "type": "boolean", "default": false }, "references": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]+$" } }, "allOf": [{ "if": { "properties": { "type": { "const": "reference" } }, "required": ["type"] }, "then": { "required": ["references"] }, "else": { "not": { "required": ["references"] } } }] } } } } }, "roles": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["name", "permissions"], "properties": { "name": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" }, "permissions": { "type": "object", "additionalProperties": { "type": "array", "items": { "enum": ["create", "read", "update", "delete"] }, "uniqueItems": true } }, "is_admin": { "type": "boolean" }, "is_default": { "type": "boolean" } } } }, "pages": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["type"], "properties": { "type": { "enum": ["list", "detail", "form", "dashboard"] }, "entity": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]+$" }, "name": { "type": "string" } } } }, "auth": { "type": "object", "additionalProperties": false, "required": ["type"], "properties": { "type": { "enum": ["magic-link"] }, "self_signup": { "type": "boolean" }, "admin_email": { "type": "string", "format": "email" } } }, "target": { "enum": ["worker", "sveltekit"] } } };
+var schema31 = { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://schemas.toranoai.com/spec/v0.1.json", "title": "Tora-Deployer project specification", "type": "object", "additionalProperties": false, "required": ["version", "name", "description", "entities", "roles", "pages", "auth"], "properties": { "$schema": { "type": "string" }, "version": { "const": "0.1" }, "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,}$" }, "description": { "type": "string", "minLength": 10 }, "entities": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["name", "fields"], "properties": { "name": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]+$" }, "description": { "type": "string" }, "fields": { "type": "array", "minItems": 2, "items": { "type": "object", "additionalProperties": false, "required": ["name", "type"], "properties": { "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "not": { "enum": ["id", "created_at"], "$comment": "Auto-generated columns \u2014 a field with the same name would duplicate them (#84)" } }, "type": { "enum": ["text", "integer", "boolean", "datetime", "reference"] }, "required": { "type": "boolean", "default": false }, "references": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]+$" } }, "allOf": [{ "if": { "properties": { "type": { "const": "reference" } }, "required": ["type"] }, "then": { "required": ["references"] }, "else": { "not": { "required": ["references"] } } }] } } } } }, "roles": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["name", "permissions"], "properties": { "name": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" }, "permissions": { "type": "object", "additionalProperties": { "type": "array", "items": { "enum": ["create", "read", "update", "delete"] }, "uniqueItems": true } }, "is_admin": { "type": "boolean" }, "is_default": { "type": "boolean" } } } }, "pages": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["type"], "properties": { "type": { "enum": ["list", "detail", "form", "dashboard"] }, "entity": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]+$" }, "name": { "type": "string" } } } }, "auth": { "type": "object", "additionalProperties": false, "required": ["type"], "properties": { "type": { "enum": ["password"] }, "self_signup": { "type": "boolean" }, "admin_email": { "type": "string", "format": "email" } } }, "target": { "enum": ["worker", "sveltekit"] } } };
 var func1 = Object.prototype.hasOwnProperty;
 var func2 = import_ucs2length.default.default ?? import_ucs2length.default;
 var func0 = import_equal.default.default ?? import_equal.default;
@@ -918,7 +918,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
           }
         }
         if (data28.type !== void 0) {
-          if (!(data28.type === "magic-link")) {
+          if (!(data28.type === "password")) {
             const err68 = { instancePath: instancePath + "/auth/type", schemaPath: "#/properties/auth/properties/type/enum", keyword: "enum", params: { allowedValues: schema31.properties.auth.properties.type.enum }, message: "must be equal to one of the allowed values" };
             if (vErrors === null) {
               vErrors = [err68];
@@ -1010,408 +1010,408 @@ function defaultRole(spec) {
 }
 
 // raw-template:src/templates/auth.js
-var auth_default = `// Auth helpers per l'app generata \u2014 Web Crypto only, nessuna dipendenza.
-export const SESSION_COOKIE = "__sess";
-export const PBKDF2_ITERATIONS = 150000;
-export const PBKDF2_VERSION = 1;
-export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-
-const enc = new TextEncoder();
-
-function toHex(buf) {
-  return [...new Uint8Array(buf)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-function randomHex(bytes) {
-  const value = new Uint8Array(bytes);
-  crypto.getRandomValues(value);
-  return toHex(value);
-}
-
-async function pbkdf2(password, saltHex, iterations) {
-  const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]);
-  const salt = Uint8Array.from(saltHex.match(/../g).map((hex) => parseInt(hex, 16)));
-  const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
-    keyMaterial,
-    256,
-  );
-  return toHex(bits);
-}
-
-export async function hashPassword(password) {
-  const salt = randomHex(16);
-  const hash = await pbkdf2(password, salt, PBKDF2_ITERATIONS);
-  return { hash, salt, iterations: PBKDF2_ITERATIONS, version: PBKDF2_VERSION };
-}
-
-/** Confronto in tempo costante su stringhe hex di pari lunghezza. */
-function timingSafeEqual(a, b) {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let index = 0; index < a.length; index += 1) {
-    diff |= a.charCodeAt(index) ^ b.charCodeAt(index);
-  }
-  return diff === 0;
-}
-
-export async function verifyPassword(password, stored) {
-  const hash = await pbkdf2(password, stored.salt, stored.iterations);
-  return timingSafeEqual(hash, stored.hash);
-}
-
-/** Re-hash a password with the current parameters before persisting it. */
-export async function setPassword(DB, userId, password) {
-  const stored = await hashPassword(password);
-  await DB.prepare('UPDATE "users" SET "password_hash" = ?, "salt" = ?, "iterations" = ?, "version" = ? WHERE "id" = ?')
-    .bind(stored.hash, stored.salt, stored.iterations, stored.version, userId)
-    .run();
-}
-
-async function sha256Hex(value) {
-  const digest = await crypto.subtle.digest("SHA-256", enc.encode(value));
-  return toHex(digest);
-}
-
-export async function createSession(DB, userId) {
-  const token = randomHex(32);
-  const tokenHash = await sha256Hex(token);
-  const expiresAt = Date.now() + SESSION_TTL_MS;
-  // A successful login replaces any previous session for this user.
-  await DB.prepare('DELETE FROM "sessions" WHERE "user_id" = ?').bind(userId).run();
-  await DB.prepare('INSERT INTO "sessions" ("token_hash", "user_id", "expires_at") VALUES (?, ?, ?)')
-    .bind(tokenHash, userId, expiresAt)
-    .run();
-  return token;
-}
-
-export async function resolveSession(DB, token) {
-  if (!token) return null;
-  const tokenHash = await sha256Hex(token);
-  const row = await DB.prepare(
-    'SELECT s."user_id" AS user_id, s."expires_at" AS expires_at, u."id" AS id, u."email" AS email, u."role" AS role ' +
-    'FROM "sessions" s JOIN "users" u ON u."id" = s."user_id" WHERE s."token_hash" = ?',
-  ).bind(tokenHash).first();
-  if (!row) return null;
-  if (Number(row.expires_at) < Date.now()) {
-    await destroySession(DB, token);
-    return null;
-  }
-  return { id: row.id, email: row.email, role: row.role };
-}
-
-export async function destroySession(DB, token) {
-  if (!token) return;
-  const tokenHash = await sha256Hex(token);
-  await DB.prepare('DELETE FROM "sessions" WHERE "token_hash" = ?').bind(tokenHash).run();
-}
-
-export function sessionCookie(token, isHttps) {
-  const parts = [
-    \`\${SESSION_COOKIE}=\${token}\`,
-    "HttpOnly",
-    "SameSite=Lax",
-    "Path=/",
-    \`Max-Age=\${Math.floor(SESSION_TTL_MS / 1000)}\`,
-  ];
-  if (isHttps) parts.push("Secure");
-  return parts.join("; ");
-}
-
-export function clearCookie() {
-  return \`\${SESSION_COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0\`;
-}
-
-export function readCookie(request, name) {
-  const header = request.headers.get("Cookie") || "";
-  for (const part of header.split(";")) {
-    const [key, ...value] = part.trim().split("=");
-    if (key === name) return value.join("=");
-  }
-  return null;
-}
-
-/** CSRF: l'Origin (fallback Referer) deve combaciare con l'host della richiesta. */
-export function checkOrigin(request) {
-  const url = new URL(request.url);
-  const origin = request.headers.get("Origin") || request.headers.get("Referer");
-  if (!origin) return false;
-  try {
-    return new URL(origin).host === url.host;
-  } catch {
-    return false;
-  }
-}
+var auth_default = `// Auth helpers per l'app generata \u2014 Web Crypto only, nessuna dipendenza.\r
+export const SESSION_COOKIE = "__sess";\r
+export const PBKDF2_ITERATIONS = 150000;\r
+export const PBKDF2_VERSION = 1;\r
+export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;\r
+\r
+const enc = new TextEncoder();\r
+\r
+function toHex(buf) {\r
+  return [...new Uint8Array(buf)].map((byte) => byte.toString(16).padStart(2, "0")).join("");\r
+}\r
+\r
+function randomHex(bytes) {\r
+  const value = new Uint8Array(bytes);\r
+  crypto.getRandomValues(value);\r
+  return toHex(value);\r
+}\r
+\r
+async function pbkdf2(password, saltHex, iterations) {\r
+  const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]);\r
+  const salt = Uint8Array.from(saltHex.match(/../g).map((hex) => parseInt(hex, 16)));\r
+  const bits = await crypto.subtle.deriveBits(\r
+    { name: "PBKDF2", salt, iterations, hash: "SHA-256" },\r
+    keyMaterial,\r
+    256,\r
+  );\r
+  return toHex(bits);\r
+}\r
+\r
+export async function hashPassword(password) {\r
+  const salt = randomHex(16);\r
+  const hash = await pbkdf2(password, salt, PBKDF2_ITERATIONS);\r
+  return { hash, salt, iterations: PBKDF2_ITERATIONS, version: PBKDF2_VERSION };\r
+}\r
+\r
+/** Confronto in tempo costante su stringhe hex di pari lunghezza. */\r
+function timingSafeEqual(a, b) {\r
+  if (a.length !== b.length) return false;\r
+  let diff = 0;\r
+  for (let index = 0; index < a.length; index += 1) {\r
+    diff |= a.charCodeAt(index) ^ b.charCodeAt(index);\r
+  }\r
+  return diff === 0;\r
+}\r
+\r
+export async function verifyPassword(password, stored) {\r
+  const hash = await pbkdf2(password, stored.salt, stored.iterations);\r
+  return timingSafeEqual(hash, stored.hash);\r
+}\r
+\r
+/** Re-hash a password with the current parameters before persisting it. */\r
+export async function setPassword(DB, userId, password) {\r
+  const stored = await hashPassword(password);\r
+  await DB.prepare('UPDATE "users" SET "password_hash" = ?, "salt" = ?, "iterations" = ?, "version" = ? WHERE "id" = ?')\r
+    .bind(stored.hash, stored.salt, stored.iterations, stored.version, userId)\r
+    .run();\r
+}\r
+\r
+async function sha256Hex(value) {\r
+  const digest = await crypto.subtle.digest("SHA-256", enc.encode(value));\r
+  return toHex(digest);\r
+}\r
+\r
+export async function createSession(DB, userId) {\r
+  const token = randomHex(32);\r
+  const tokenHash = await sha256Hex(token);\r
+  const expiresAt = Date.now() + SESSION_TTL_MS;\r
+  // A successful login replaces any previous session for this user.\r
+  await DB.prepare('DELETE FROM "sessions" WHERE "user_id" = ?').bind(userId).run();\r
+  await DB.prepare('INSERT INTO "sessions" ("token_hash", "user_id", "expires_at") VALUES (?, ?, ?)')\r
+    .bind(tokenHash, userId, expiresAt)\r
+    .run();\r
+  return token;\r
+}\r
+\r
+export async function resolveSession(DB, token) {\r
+  if (!token) return null;\r
+  const tokenHash = await sha256Hex(token);\r
+  const row = await DB.prepare(\r
+    'SELECT s."user_id" AS user_id, s."expires_at" AS expires_at, u."id" AS id, u."email" AS email, u."role" AS role ' +\r
+    'FROM "sessions" s JOIN "users" u ON u."id" = s."user_id" WHERE s."token_hash" = ?',\r
+  ).bind(tokenHash).first();\r
+  if (!row) return null;\r
+  if (Number(row.expires_at) < Date.now()) {\r
+    await destroySession(DB, token);\r
+    return null;\r
+  }\r
+  return { id: row.id, email: row.email, role: row.role };\r
+}\r
+\r
+export async function destroySession(DB, token) {\r
+  if (!token) return;\r
+  const tokenHash = await sha256Hex(token);\r
+  await DB.prepare('DELETE FROM "sessions" WHERE "token_hash" = ?').bind(tokenHash).run();\r
+}\r
+\r
+export function sessionCookie(token, isHttps) {\r
+  const parts = [\r
+    \`\${SESSION_COOKIE}=\${token}\`,\r
+    "HttpOnly",\r
+    "SameSite=Lax",\r
+    "Path=/",\r
+    \`Max-Age=\${Math.floor(SESSION_TTL_MS / 1000)}\`,\r
+  ];\r
+  if (isHttps) parts.push("Secure");\r
+  return parts.join("; ");\r
+}\r
+\r
+export function clearCookie() {\r
+  return \`\${SESSION_COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0\`;\r
+}\r
+\r
+export function readCookie(request, name) {\r
+  const header = request.headers.get("Cookie") || "";\r
+  for (const part of header.split(";")) {\r
+    const [key, ...value] = part.trim().split("=");\r
+    if (key === name) return value.join("=");\r
+  }\r
+  return null;\r
+}\r
+\r
+/** CSRF: l'Origin (fallback Referer) deve combaciare con l'host della richiesta. */\r
+export function checkOrigin(request) {\r
+  const url = new URL(request.url);\r
+  const origin = request.headers.get("Origin") || request.headers.get("Referer");\r
+  if (!origin) return false;\r
+  try {\r
+    return new URL(origin).host === url.host;\r
+  } catch {\r
+    return false;\r
+  }\r
+}\r
 `;
 
 // raw-template:src/templates/index.js
-var templates_default = `// Worker entry, generic CRUD router driven by config and isolated views.
-// No build step, no npm dependencies, Web-standard APIs plus D1 only.
-import { ENTITIES, APP_NAME, PERMISSIONS, ROLES, ADMIN_ROLE, DEFAULT_ROLE } from "./config.js";
-import { humanize } from "./lib/ui-kit.js";
-import { dbList, dbGet, dbInsert, dbUpdate, dbDelete, dbCount } from "./lib/db.js";
-import { SESSION_COOKIE, hashPassword, verifyPassword, setPassword, createSession, resolveSession, destroySession, sessionCookie, clearCookie, readCookie, checkOrigin } from "./lib/auth.js";
-import { renderDashboard, renderList, renderForm, renderDetail, renderLogin, renderSignup, renderAccountPassword, renderUsersList, renderUserForm } from "./views.js";
-
-const APP_TITLE = humanize(APP_NAME);
-
-function html(body, status = 200) {
-  return new Response(body, { status, headers: { "Content-Type": "text/html;charset=UTF-8" } });
-}
-
-function canAccess(role, entityName, action) {
-  const permissions = PERMISSIONS[role];
-  return !!(permissions && permissions[entityName] && permissions[entityName].includes(action));
-}
-
-function roleForEmail(email, env) {
-  return env.ADMIN_EMAIL && email === env.ADMIN_EMAIL ? ADMIN_ROLE : DEFAULT_ROLE;
-}
-
-function makeCtx(user, activePath, options = {}) {
-  return {
-    user,
-    appTitle: APP_TITLE,
-    entities: ENTITIES,
-    roles: ROLES,
-    isAdmin: user ? user.role === ADMIN_ROLE : false,
-    activePath,
-    ...options,
-    can: (entityName, action) => canAccess(user ? user.role : null, entityName, action),
-  };
-}
-
-function requireAdmin(user) {
-  return !!user && user.role === ADMIN_ROLE;
-}
-
-function validateFormData(entity, data) {
-  for (const field of entity.fields) {
-    if (field.required && !data[field.name]) {
-      return \`Il campo \xAB\${humanize(field.name)}\xBB \xE8 obbligatorio.\`;
-    }
-  }
-  return null;
-}
-
-function extractFields(entity, formData) {
-  const cols = [];
-  const vals = [];
-  for (const field of entity.fields) {
-    cols.push(field.name);
-    if (field.type === "boolean") {
-      vals.push(formData.get(field.name) === "1" ? 1 : 0);
-    } else {
-      const value = formData.get(field.name);
-      vals.push(value === "" ? null : value);
-    }
-  }
-  return { cols, vals };
-}
-
-async function handleRequest(request, env) {
-  const url = new URL(request.url);
-  const path = url.pathname;
-  const method = request.method.toUpperCase();
-  const DB = env.DB;
-  const isHttps = url.protocol === "https:";
-
-  let user = null;
-  if (env.DEV_AUTH_BYPASS === "1") {
-    user = { id: "dev-admin", email: "dev@localhost", role: ADMIN_ROLE };
-  } else {
-    user = await resolveSession(DB, readCookie(request, SESSION_COOKIE));
-  }
-
-  if (method === "POST" && !checkOrigin(request)) {
-    return new Response("Bad origin", { status: 403 });
-  }
-
-  if (path === "/login" && method === "GET") return html(renderLogin(null, makeCtx(null, "/login")));
-  if (path === "/login" && method === "POST") {
-    const formData = await request.formData();
-    const email = String(formData.get("email") || "").trim().toLowerCase();
-    const password = String(formData.get("password") || "");
-    const row = await DB.prepare('SELECT * FROM "users" WHERE "email" = ?').bind(email).first();
-    if (!row || !(await verifyPassword(password, { hash: row.password_hash, salt: row.salt, iterations: row.iterations }))) {
-      return html(renderLogin("Credenziali non valide.", makeCtx(null, "/login")), 401);
-    }
-    const token = await createSession(DB, row.id);
-    return new Response(null, { status: 303, headers: { Location: "/", "Set-Cookie": sessionCookie(token, isHttps) } });
-  }
-  if (path === "/signup" && method === "GET") return html(renderSignup(null, makeCtx(null, "/signup")));
-  if (path === "/signup" && method === "POST") {
-    const formData = await request.formData();
-    const email = String(formData.get("email") || "").trim().toLowerCase();
-    const password = String(formData.get("password") || "");
-    if (password.length < 10) return html(renderSignup("La password deve avere almeno 10 caratteri.", makeCtx(null, "/signup")), 422);
-    const exists = await DB.prepare('SELECT 1 FROM "users" WHERE "email" = ?').bind(email).first();
-    if (exists) return html(renderSignup("Email gi\xE0 registrata.", makeCtx(null, "/signup")), 422);
-    const stored = await hashPassword(password);
-    const id = crypto.randomUUID();
-    await DB.prepare('INSERT INTO "users" ("id", "email", "password_hash", "salt", "iterations", "version", "role") VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .bind(id, email, stored.hash, stored.salt, stored.iterations, stored.version, roleForEmail(email, env))
-      .run();
-    const token = await createSession(DB, id);
-    return new Response(null, { status: 303, headers: { Location: "/", "Set-Cookie": sessionCookie(token, isHttps) } });
-  }
-  if (path === "/logout" && method === "POST") {
-    await destroySession(DB, readCookie(request, SESSION_COOKIE));
-    return new Response(null, { status: 303, headers: { Location: "/login", "Set-Cookie": clearCookie() } });
-  }
-
-  if (!user) return new Response(null, { status: 303, headers: { Location: "/login" } });
-
-  // Account password: every authenticated user must prove the current password.
-  if (path === "/account/password" && method === "GET") {
-    return html(renderAccountPassword(null, makeCtx(user, "/account/password", { passwordUpdated: url.searchParams.get("ok") === "1" })));
-  }
-  if (path === "/account/password" && method === "POST") {
-    const formData = await request.formData();
-    const current = String(formData.get("current_password") || "");
-    const next = String(formData.get("new_password") || "");
-    const row = await DB.prepare('SELECT * FROM "users" WHERE "id" = ?').bind(user.id).first();
-    if (!row || !(await verifyPassword(current, { hash: row.password_hash, salt: row.salt, iterations: row.iterations }))) {
-      return html(renderAccountPassword("Password attuale errata.", makeCtx(user, "/account/password")), 401);
-    }
-    if (next.length < 10) {
-      return html(renderAccountPassword("La nuova password deve avere almeno 10 caratteri.", makeCtx(user, "/account/password")), 422);
-    }
-    await setPassword(DB, user.id, next);
-    return new Response(null, { status: 303, headers: { Location: "/account/password?ok=1" } });
-  }
-
-  // User management: roles are constrained to the generated config at runtime.
-  if (path === "/admin/users" && method === "GET") {
-    if (!requireAdmin(user)) return new Response("Forbidden", { status: 403 });
-    const { results } = await DB.prepare('SELECT "id", "email", "role", "created_at" FROM "users" ORDER BY "created_at" DESC').all();
-    return html(renderUsersList(results ?? [], makeCtx(user, "/admin/users")));
-  }
-  if (path === "/admin/users/new" && method === "GET") {
-    if (!requireAdmin(user)) return new Response("Forbidden", { status: 403 });
-    return html(renderUserForm(null, makeCtx(user, "/admin/users")));
-  }
-  if (path === "/admin/users" && method === "POST") {
-    if (!requireAdmin(user)) return new Response("Forbidden", { status: 403 });
-    const formData = await request.formData();
-    const email = String(formData.get("email") || "").trim().toLowerCase();
-    const password = String(formData.get("password") || "");
-    const role = String(formData.get("role") || "");
-    if (!ROLES.includes(role)) return html(renderUserForm("Ruolo non valido.", makeCtx(user, "/admin/users")), 422);
-    if (password.length < 10) return html(renderUserForm("La password deve avere almeno 10 caratteri.", makeCtx(user, "/admin/users")), 422);
-    const exists = await DB.prepare('SELECT 1 FROM "users" WHERE "email" = ?').bind(email).first();
-    if (exists) return html(renderUserForm("Email gi\xE0 registrata.", makeCtx(user, "/admin/users")), 422);
-    const stored = await hashPassword(password);
-    await DB.prepare('INSERT INTO "users" ("id", "email", "password_hash", "salt", "iterations", "version", "role") VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .bind(crypto.randomUUID(), email, stored.hash, stored.salt, stored.iterations, stored.version, role)
-      .run();
-    return new Response(null, { status: 303, headers: { Location: "/admin/users" } });
-  }
-  const roleMatch = path.match(/^\\/admin\\/users\\/([^/]+)\\/role$/);
-  if (roleMatch && method === "POST") {
-    if (!requireAdmin(user)) return new Response("Forbidden", { status: 403 });
-    const formData = await request.formData();
-    const role = String(formData.get("role") || "");
-    if (!ROLES.includes(role)) return new Response("Bad role", { status: 422 });
-    await DB.prepare('UPDATE "users" SET "role" = ? WHERE "id" = ?').bind(role, roleMatch[1]).run();
-    return new Response(null, { status: 303, headers: { Location: "/admin/users" } });
-  }
-  const deleteUserMatch = path.match(/^\\/admin\\/users\\/([^/]+)\\/delete$/);
-  if (deleteUserMatch && method === "POST") {
-    if (!requireAdmin(user)) return new Response("Forbidden", { status: 403 });
-    if (deleteUserMatch[1] === user.id) return new Response("Non puoi eliminare te stesso.", { status: 400 });
-    await DB.prepare('DELETE FROM "users" WHERE "id" = ?').bind(deleteUserMatch[1]).run();
-    return new Response(null, { status: 303, headers: { Location: "/admin/users" } });
-  }
-
-  if (path === "/" && method === "GET") {
-    const counts = {};
-    for (const entity of ENTITIES) counts[entity.slug] = await dbCount(DB, entity.table);
-    return html(renderDashboard(counts, makeCtx(user, "/")));
-  }
-
-  for (const entity of ENTITIES) {
-    const base = "/" + entity.slug;
-    if (path === base && method === "GET") {
-      if (!canAccess(user.role, entity.name, "read")) return new Response("Forbidden", { status: 403 });
-      return html(renderList(entity, await dbList(DB, entity.table), makeCtx(user, base)));
-    }
-    if (path === base + "/new" && method === "GET") {
-      if (!canAccess(user.role, entity.name, "create")) return new Response("Forbidden", { status: 403 });
-      return html(renderForm(entity, null, null, makeCtx(user, base)));
-    }
-    if (path === base && method === "POST") {
-      if (!canAccess(user.role, entity.name, "create")) return new Response("Forbidden", { status: 403 });
-      const formData = await request.formData();
-      const data = Object.fromEntries(formData.entries());
-      const error = validateFormData(entity, data);
-      if (error) return html(renderForm(entity, data, error, makeCtx(user, base)), 422);
-      const { cols, vals } = extractFields(entity, formData);
-      await dbInsert(DB, entity.table, cols, vals);
-      return Response.redirect(url.origin + base, 303);
-    }
-
-    const idMatch = path.match(new RegExp("^" + base + "/([^/]+)$"));
-    if (idMatch) {
-      const id = idMatch[1];
-      if (method === "GET") {
-        if (!canAccess(user.role, entity.name, "read")) return new Response("Forbidden", { status: 403 });
-        const row = await dbGet(DB, entity.table, id);
-        return row ? html(renderDetail(entity, row, makeCtx(user, base))) : new Response("Not found", { status: 404 });
-      }
-      if (method === "POST") {
-        if (!canAccess(user.role, entity.name, "update")) return new Response("Forbidden", { status: 403 });
-        const formData = await request.formData();
-        const data = Object.fromEntries(formData.entries());
-        const error = validateFormData(entity, data);
-        if (error) {
-          const row = await dbGet(DB, entity.table, id);
-          return html(renderForm(entity, { ...row, ...data }, error, makeCtx(user, base)), 422);
-        }
-        const { cols, vals } = extractFields(entity, formData);
-        await dbUpdate(DB, entity.table, cols, vals, id);
-        return Response.redirect(url.origin + base + "/" + id, 303);
-      }
-    }
-
-    const editMatch = path.match(new RegExp("^" + base + "/([^/]+)/edit$"));
-    if (editMatch && method === "GET") {
-      if (!canAccess(user.role, entity.name, "read")) return new Response("Forbidden", { status: 403 });
-      const row = await dbGet(DB, entity.table, editMatch[1]);
-      return row ? html(renderForm(entity, row, null, makeCtx(user, base))) : new Response("Not found", { status: 404 });
-    }
-
-    const deleteMatch = path.match(new RegExp("^" + base + "/([^/]+)/delete$"));
-    if (deleteMatch && method === "POST") {
-      if (!canAccess(user.role, entity.name, "delete")) return new Response("Forbidden", { status: 403 });
-      await dbDelete(DB, entity.table, deleteMatch[1]);
-      return Response.redirect(url.origin + base, 303);
-    }
-  }
-
-  return new Response("Not found", { status: 404 });
-}
-
-export default {
-  async fetch(request, env) {
-    try {
-      return await handleRequest(request, env);
-    } catch (error) {
-      console.error(error);
-      return new Response("Internal Server Error", { status: 500 });
-    }
-  },
-};
+var templates_default = `// Worker entry, generic CRUD router driven by config and isolated views.\r
+// No build step, no npm dependencies, Web-standard APIs plus D1 only.\r
+import { ENTITIES, APP_NAME, PERMISSIONS, ROLES, ADMIN_ROLE, DEFAULT_ROLE } from "./config.js";\r
+import { humanize } from "./lib/ui-kit.js";\r
+import { dbList, dbGet, dbInsert, dbUpdate, dbDelete, dbCount } from "./lib/db.js";\r
+import { SESSION_COOKIE, hashPassword, verifyPassword, setPassword, createSession, resolveSession, destroySession, sessionCookie, clearCookie, readCookie, checkOrigin } from "./lib/auth.js";\r
+import { renderDashboard, renderList, renderForm, renderDetail, renderLogin, renderSignup, renderAccountPassword, renderUsersList, renderUserForm } from "./views.js";\r
+\r
+const APP_TITLE = humanize(APP_NAME);\r
+\r
+function html(body, status = 200) {\r
+  return new Response(body, { status, headers: { "Content-Type": "text/html;charset=UTF-8" } });\r
+}\r
+\r
+function canAccess(role, entityName, action) {\r
+  const permissions = PERMISSIONS[role];\r
+  return !!(permissions && permissions[entityName] && permissions[entityName].includes(action));\r
+}\r
+\r
+function roleForEmail(email, env) {\r
+  return env.ADMIN_EMAIL && email === env.ADMIN_EMAIL ? ADMIN_ROLE : DEFAULT_ROLE;\r
+}\r
+\r
+function makeCtx(user, activePath, options = {}) {\r
+  return {\r
+    user,\r
+    appTitle: APP_TITLE,\r
+    entities: ENTITIES,\r
+    roles: ROLES,\r
+    isAdmin: user ? user.role === ADMIN_ROLE : false,\r
+    activePath,\r
+    ...options,\r
+    can: (entityName, action) => canAccess(user ? user.role : null, entityName, action),\r
+  };\r
+}\r
+\r
+function requireAdmin(user) {\r
+  return !!user && user.role === ADMIN_ROLE;\r
+}\r
+\r
+function validateFormData(entity, data) {\r
+  for (const field of entity.fields) {\r
+    if (field.required && !data[field.name]) {\r
+      return \`Il campo \xAB\${humanize(field.name)}\xBB \xE8 obbligatorio.\`;\r
+    }\r
+  }\r
+  return null;\r
+}\r
+\r
+function extractFields(entity, formData) {\r
+  const cols = [];\r
+  const vals = [];\r
+  for (const field of entity.fields) {\r
+    cols.push(field.name);\r
+    if (field.type === "boolean") {\r
+      vals.push(formData.get(field.name) === "1" ? 1 : 0);\r
+    } else {\r
+      const value = formData.get(field.name);\r
+      vals.push(value === "" ? null : value);\r
+    }\r
+  }\r
+  return { cols, vals };\r
+}\r
+\r
+async function handleRequest(request, env) {\r
+  const url = new URL(request.url);\r
+  const path = url.pathname;\r
+  const method = request.method.toUpperCase();\r
+  const DB = env.DB;\r
+  const isHttps = url.protocol === "https:";\r
+\r
+  let user = null;\r
+  if (env.DEV_AUTH_BYPASS === "1") {\r
+    user = { id: "dev-admin", email: "dev@localhost", role: ADMIN_ROLE };\r
+  } else {\r
+    user = await resolveSession(DB, readCookie(request, SESSION_COOKIE));\r
+  }\r
+\r
+  if (method === "POST" && !checkOrigin(request)) {\r
+    return new Response("Bad origin", { status: 403 });\r
+  }\r
+\r
+  if (path === "/login" && method === "GET") return html(renderLogin(null, makeCtx(null, "/login")));\r
+  if (path === "/login" && method === "POST") {\r
+    const formData = await request.formData();\r
+    const email = String(formData.get("email") || "").trim().toLowerCase();\r
+    const password = String(formData.get("password") || "");\r
+    const row = await DB.prepare('SELECT * FROM "users" WHERE "email" = ?').bind(email).first();\r
+    if (!row || !(await verifyPassword(password, { hash: row.password_hash, salt: row.salt, iterations: row.iterations }))) {\r
+      return html(renderLogin("Credenziali non valide.", makeCtx(null, "/login")), 401);\r
+    }\r
+    const token = await createSession(DB, row.id);\r
+    return new Response(null, { status: 303, headers: { Location: "/", "Set-Cookie": sessionCookie(token, isHttps) } });\r
+  }\r
+  if (path === "/signup" && method === "GET") return html(renderSignup(null, makeCtx(null, "/signup")));\r
+  if (path === "/signup" && method === "POST") {\r
+    const formData = await request.formData();\r
+    const email = String(formData.get("email") || "").trim().toLowerCase();\r
+    const password = String(formData.get("password") || "");\r
+    if (password.length < 10) return html(renderSignup("La password deve avere almeno 10 caratteri.", makeCtx(null, "/signup")), 422);\r
+    const exists = await DB.prepare('SELECT 1 FROM "users" WHERE "email" = ?').bind(email).first();\r
+    if (exists) return html(renderSignup("Email gi\xE0 registrata.", makeCtx(null, "/signup")), 422);\r
+    const stored = await hashPassword(password);\r
+    const id = crypto.randomUUID();\r
+    await DB.prepare('INSERT INTO "users" ("id", "email", "password_hash", "salt", "iterations", "version", "role") VALUES (?, ?, ?, ?, ?, ?, ?)')\r
+      .bind(id, email, stored.hash, stored.salt, stored.iterations, stored.version, roleForEmail(email, env))\r
+      .run();\r
+    const token = await createSession(DB, id);\r
+    return new Response(null, { status: 303, headers: { Location: "/", "Set-Cookie": sessionCookie(token, isHttps) } });\r
+  }\r
+  if (path === "/logout" && method === "POST") {\r
+    await destroySession(DB, readCookie(request, SESSION_COOKIE));\r
+    return new Response(null, { status: 303, headers: { Location: "/login", "Set-Cookie": clearCookie() } });\r
+  }\r
+\r
+  if (!user) return new Response(null, { status: 303, headers: { Location: "/login" } });\r
+\r
+  // Account password: every authenticated user must prove the current password.\r
+  if (path === "/account/password" && method === "GET") {\r
+    return html(renderAccountPassword(null, makeCtx(user, "/account/password", { passwordUpdated: url.searchParams.get("ok") === "1" })));\r
+  }\r
+  if (path === "/account/password" && method === "POST") {\r
+    const formData = await request.formData();\r
+    const current = String(formData.get("current_password") || "");\r
+    const next = String(formData.get("new_password") || "");\r
+    const row = await DB.prepare('SELECT * FROM "users" WHERE "id" = ?').bind(user.id).first();\r
+    if (!row || !(await verifyPassword(current, { hash: row.password_hash, salt: row.salt, iterations: row.iterations }))) {\r
+      return html(renderAccountPassword("Password attuale errata.", makeCtx(user, "/account/password")), 401);\r
+    }\r
+    if (next.length < 10) {\r
+      return html(renderAccountPassword("La nuova password deve avere almeno 10 caratteri.", makeCtx(user, "/account/password")), 422);\r
+    }\r
+    await setPassword(DB, user.id, next);\r
+    return new Response(null, { status: 303, headers: { Location: "/account/password?ok=1" } });\r
+  }\r
+\r
+  // User management: roles are constrained to the generated config at runtime.\r
+  if (path === "/admin/users" && method === "GET") {\r
+    if (!requireAdmin(user)) return new Response("Forbidden", { status: 403 });\r
+    const { results } = await DB.prepare('SELECT "id", "email", "role", "created_at" FROM "users" ORDER BY "created_at" DESC').all();\r
+    return html(renderUsersList(results ?? [], makeCtx(user, "/admin/users")));\r
+  }\r
+  if (path === "/admin/users/new" && method === "GET") {\r
+    if (!requireAdmin(user)) return new Response("Forbidden", { status: 403 });\r
+    return html(renderUserForm(null, makeCtx(user, "/admin/users")));\r
+  }\r
+  if (path === "/admin/users" && method === "POST") {\r
+    if (!requireAdmin(user)) return new Response("Forbidden", { status: 403 });\r
+    const formData = await request.formData();\r
+    const email = String(formData.get("email") || "").trim().toLowerCase();\r
+    const password = String(formData.get("password") || "");\r
+    const role = String(formData.get("role") || "");\r
+    if (!ROLES.includes(role)) return html(renderUserForm("Ruolo non valido.", makeCtx(user, "/admin/users")), 422);\r
+    if (password.length < 10) return html(renderUserForm("La password deve avere almeno 10 caratteri.", makeCtx(user, "/admin/users")), 422);\r
+    const exists = await DB.prepare('SELECT 1 FROM "users" WHERE "email" = ?').bind(email).first();\r
+    if (exists) return html(renderUserForm("Email gi\xE0 registrata.", makeCtx(user, "/admin/users")), 422);\r
+    const stored = await hashPassword(password);\r
+    await DB.prepare('INSERT INTO "users" ("id", "email", "password_hash", "salt", "iterations", "version", "role") VALUES (?, ?, ?, ?, ?, ?, ?)')\r
+      .bind(crypto.randomUUID(), email, stored.hash, stored.salt, stored.iterations, stored.version, role)\r
+      .run();\r
+    return new Response(null, { status: 303, headers: { Location: "/admin/users" } });\r
+  }\r
+  const roleMatch = path.match(/^\\/admin\\/users\\/([^/]+)\\/role$/);\r
+  if (roleMatch && method === "POST") {\r
+    if (!requireAdmin(user)) return new Response("Forbidden", { status: 403 });\r
+    const formData = await request.formData();\r
+    const role = String(formData.get("role") || "");\r
+    if (!ROLES.includes(role)) return new Response("Bad role", { status: 422 });\r
+    await DB.prepare('UPDATE "users" SET "role" = ? WHERE "id" = ?').bind(role, roleMatch[1]).run();\r
+    return new Response(null, { status: 303, headers: { Location: "/admin/users" } });\r
+  }\r
+  const deleteUserMatch = path.match(/^\\/admin\\/users\\/([^/]+)\\/delete$/);\r
+  if (deleteUserMatch && method === "POST") {\r
+    if (!requireAdmin(user)) return new Response("Forbidden", { status: 403 });\r
+    if (deleteUserMatch[1] === user.id) return new Response("Non puoi eliminare te stesso.", { status: 400 });\r
+    await DB.prepare('DELETE FROM "users" WHERE "id" = ?').bind(deleteUserMatch[1]).run();\r
+    return new Response(null, { status: 303, headers: { Location: "/admin/users" } });\r
+  }\r
+\r
+  if (path === "/" && method === "GET") {\r
+    const counts = {};\r
+    for (const entity of ENTITIES) counts[entity.slug] = await dbCount(DB, entity.table);\r
+    return html(renderDashboard(counts, makeCtx(user, "/")));\r
+  }\r
+\r
+  for (const entity of ENTITIES) {\r
+    const base = "/" + entity.slug;\r
+    if (path === base && method === "GET") {\r
+      if (!canAccess(user.role, entity.name, "read")) return new Response("Forbidden", { status: 403 });\r
+      return html(renderList(entity, await dbList(DB, entity.table), makeCtx(user, base)));\r
+    }\r
+    if (path === base + "/new" && method === "GET") {\r
+      if (!canAccess(user.role, entity.name, "create")) return new Response("Forbidden", { status: 403 });\r
+      return html(renderForm(entity, null, null, makeCtx(user, base)));\r
+    }\r
+    if (path === base && method === "POST") {\r
+      if (!canAccess(user.role, entity.name, "create")) return new Response("Forbidden", { status: 403 });\r
+      const formData = await request.formData();\r
+      const data = Object.fromEntries(formData.entries());\r
+      const error = validateFormData(entity, data);\r
+      if (error) return html(renderForm(entity, data, error, makeCtx(user, base)), 422);\r
+      const { cols, vals } = extractFields(entity, formData);\r
+      await dbInsert(DB, entity.table, cols, vals);\r
+      return Response.redirect(url.origin + base, 303);\r
+    }\r
+\r
+    const idMatch = path.match(new RegExp("^" + base + "/([^/]+)$"));\r
+    if (idMatch) {\r
+      const id = idMatch[1];\r
+      if (method === "GET") {\r
+        if (!canAccess(user.role, entity.name, "read")) return new Response("Forbidden", { status: 403 });\r
+        const row = await dbGet(DB, entity.table, id);\r
+        return row ? html(renderDetail(entity, row, makeCtx(user, base))) : new Response("Not found", { status: 404 });\r
+      }\r
+      if (method === "POST") {\r
+        if (!canAccess(user.role, entity.name, "update")) return new Response("Forbidden", { status: 403 });\r
+        const formData = await request.formData();\r
+        const data = Object.fromEntries(formData.entries());\r
+        const error = validateFormData(entity, data);\r
+        if (error) {\r
+          const row = await dbGet(DB, entity.table, id);\r
+          return html(renderForm(entity, { ...row, ...data }, error, makeCtx(user, base)), 422);\r
+        }\r
+        const { cols, vals } = extractFields(entity, formData);\r
+        await dbUpdate(DB, entity.table, cols, vals, id);\r
+        return Response.redirect(url.origin + base + "/" + id, 303);\r
+      }\r
+    }\r
+\r
+    const editMatch = path.match(new RegExp("^" + base + "/([^/]+)/edit$"));\r
+    if (editMatch && method === "GET") {\r
+      if (!canAccess(user.role, entity.name, "read")) return new Response("Forbidden", { status: 403 });\r
+      const row = await dbGet(DB, entity.table, editMatch[1]);\r
+      return row ? html(renderForm(entity, row, null, makeCtx(user, base))) : new Response("Not found", { status: 404 });\r
+    }\r
+\r
+    const deleteMatch = path.match(new RegExp("^" + base + "/([^/]+)/delete$"));\r
+    if (deleteMatch && method === "POST") {\r
+      if (!canAccess(user.role, entity.name, "delete")) return new Response("Forbidden", { status: 403 });\r
+      await dbDelete(DB, entity.table, deleteMatch[1]);\r
+      return Response.redirect(url.origin + base, 303);\r
+    }\r
+  }\r
+\r
+  return new Response("Not found", { status: 404 });\r
+}\r
+\r
+export default {\r
+  async fetch(request, env) {\r
+    try {\r
+      return await handleRequest(request, env);\r
+    } catch (error) {\r
+      console.error(error);\r
+      return new Response("Internal Server Error", { status: 500 });\r
+    }\r
+  },\r
+};\r
 `;
 
 // raw-template:src/templates/shell.js
-var shell_default = '// Scheletro HTML del motore. Inietta stili e chrome forniti dalle viste.\n// Include l\'inspector live usato dall\'anteprima per l\'iterazione visiva.\nexport function shell(title, bodyHtml, stylesHtml, chromeHtml) {\n  return `<!doctype html>\n<html lang="it">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-width, initial-scale=1" />\n  <title>${title}</title>\n  <style>${stylesHtml}</style>\n</head>\n<body>\n  ${chromeHtml}\n  <main>${bodyHtml}</main>\n  <script>\n  (function () {\n    var on = false, prev = null, parentOrigin = null;\n    function selectorFor(el) {\n      if (el.id) return "#" + el.id;\n      var path = [], n = el;\n      while (n && n.tagName && n !== document.body && path.length < 5) {\n        var i = 1, s = n;\n        while ((s = s.previousElementSibling)) if (s.tagName === n.tagName) i++;\n        path.unshift(n.tagName.toLowerCase() + ":nth-of-type(" + i + ")");\n        n = n.parentElement;\n      }\n      return path.join(" > ");\n    }\n    window.addEventListener("message", function (e) {\n      if (e.source !== window.parent) return;\n      var t = e.data && e.data.type;\n      if (t === "enable_inspector") { on = true; parentOrigin = e.origin; }\n      if (t === "disable_inspector") { on = false; if (prev) { prev.style.outline = ""; prev = null; } }\n    });\n    document.addEventListener("mouseover", function (e) {\n      if (!on) return;\n      if (prev) prev.style.outline = "";\n      prev = e.target; prev.style.outline = "2px solid #0f766e";\n    }, true);\n    document.addEventListener("click", function (e) {\n      if (!on || !parentOrigin) return;\n      e.preventDefault(); e.stopPropagation();\n      var el = e.target, r = el.getBoundingClientRect();\n      window.parent.postMessage({\n        type: "element_clicked",\n        selector: selectorFor(el),\n        textContent: (el.textContent || "").trim().slice(0, 120),\n        tagName: el.tagName,\n        boundingRect: { x: r.x, y: r.y, width: r.width, height: r.height },\n      }, parentOrigin);\n    }, true);\n  })();\n  </script>\n</body>\n</html>`;\n}\n';
+var shell_default = '// Scheletro HTML del motore. Inietta stili e chrome forniti dalle viste.\r\n// Include l\'inspector live usato dall\'anteprima per l\'iterazione visiva.\r\nexport function shell(title, bodyHtml, stylesHtml, chromeHtml) {\r\n  return `<!doctype html>\r\n<html lang="it">\r\n<head>\r\n  <meta charset="utf-8" />\r\n  <meta name="viewport" content="width=device-width, initial-scale=1" />\r\n  <title>${title}</title>\r\n  <style>${stylesHtml}</style>\r\n</head>\r\n<body>\r\n  ${chromeHtml}\r\n  <main>${bodyHtml}</main>\r\n  <script>\r\n  (function () {\r\n    var on = false, prev = null, parentOrigin = null;\r\n    function selectorFor(el) {\r\n      if (el.id) return "#" + el.id;\r\n      var path = [], n = el;\r\n      while (n && n.tagName && n !== document.body && path.length < 5) {\r\n        var i = 1, s = n;\r\n        while ((s = s.previousElementSibling)) if (s.tagName === n.tagName) i++;\r\n        path.unshift(n.tagName.toLowerCase() + ":nth-of-type(" + i + ")");\r\n        n = n.parentElement;\r\n      }\r\n      return path.join(" > ");\r\n    }\r\n    window.addEventListener("message", function (e) {\r\n      if (e.source !== window.parent) return;\r\n      var t = e.data && e.data.type;\r\n      if (t === "enable_inspector") { on = true; parentOrigin = e.origin; }\r\n      if (t === "disable_inspector") { on = false; if (prev) { prev.style.outline = ""; prev = null; } }\r\n    });\r\n    document.addEventListener("mouseover", function (e) {\r\n      if (!on) return;\r\n      if (prev) prev.style.outline = "";\r\n      prev = e.target; prev.style.outline = "2px solid #0f766e";\r\n    }, true);\r\n    document.addEventListener("click", function (e) {\r\n      if (!on || !parentOrigin) return;\r\n      e.preventDefault(); e.stopPropagation();\r\n      var el = e.target, r = el.getBoundingClientRect();\r\n      window.parent.postMessage({\r\n        type: "element_clicked",\r\n        selector: selectorFor(el),\r\n        textContent: (el.textContent || "").trim().slice(0, 120),\r\n        tagName: el.tagName,\r\n        boundingRect: { x: r.x, y: r.y, width: r.width, height: r.height },\r\n      }, parentOrigin);\r\n    }, true);\r\n  })();\r\n  </script>\r\n</body>\r\n</html>`;\r\n}\r\n';
 
 // raw-template:src/templates/ui-kit.js
-var ui_kit_default = '// Helper di contratto motore. Le viste li usano, non li modificano.\n\nexport function escHtml(s) {\n  if (s == null) return "";\n  return String(s)\n    .replace(/&/g, "&amp;")\n    .replace(/</g, "&lt;")\n    .replace(/>/g, "&gt;")\n    .replace(/"/g, "&quot;")\n    .replace(/\'/g, "&#39;");\n}\n\nexport function humanize(s) {\n  return String(s)\n    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")\n    .replace(/[-_]+/g, " ")\n    .trim()\n    .split(/\\s+/)\n    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))\n    .join(" ");\n}\n\nexport function fmtDateTime(value) {\n  if (value == null || value === "") return "";\n  const date = new Date(value);\n  if (isNaN(date.getTime())) return String(value);\n  return date.toLocaleString("it-IT", {\n    day: "2-digit", month: "2-digit", year: "numeric",\n    hour: "2-digit", minute: "2-digit",\n  });\n}\n\nexport function fmtCell(field, value) {\n  if (field.type === "boolean") {\n    return value\n      ? \'<span class="badge badge-on" title="S\xEC">\u2713</span>\'\n      : \'<span class="badge badge-off" title="No">\u2014</span>\';\n  }\n  if (field.type === "datetime") return escHtml(fmtDateTime(value));\n  if (field.type === "id") return `<span class="mono">${escHtml(value ?? "")}</span>`;\n  return escHtml(value ?? "");\n}\n\n/** Rende un input con il name corretto, vincolando il contratto con il router. */\nexport function fieldInput(field, value) {\n  const name = field.name;\n  const required = field.required ? " required" : "";\n  if (field.type === "boolean") {\n    return `<input type="checkbox" name="${name}" value="1"${value ? " checked" : ""} />`;\n  }\n  const escaped = value == null ? "" : escHtml(String(value));\n  if (field.type === "integer") return `<input type="number" name="${name}" value="${escaped}"${required} />`;\n  if (field.type === "datetime") return `<input type="datetime-local" name="${name}" value="${escaped}"${required} />`;\n  return `<input type="text" name="${name}" value="${escaped}"${required} />`;\n}\n\n/** URL del form, /slug per nuovo e /slug/:id per modifica. */\nexport function formAction(entity, row) {\n  return row && row.id ? `/${entity.slug}/${escHtml(row.id)}` : `/${entity.slug}`;\n}\n';
+var ui_kit_default = '// Helper di contratto motore. Le viste li usano, non li modificano.\r\n\r\nexport function escHtml(s) {\r\n  if (s == null) return "";\r\n  return String(s)\r\n    .replace(/&/g, "&amp;")\r\n    .replace(/</g, "&lt;")\r\n    .replace(/>/g, "&gt;")\r\n    .replace(/"/g, "&quot;")\r\n    .replace(/\'/g, "&#39;");\r\n}\r\n\r\nexport function humanize(s) {\r\n  return String(s)\r\n    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")\r\n    .replace(/[-_]+/g, " ")\r\n    .trim()\r\n    .split(/\\s+/)\r\n    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))\r\n    .join(" ");\r\n}\r\n\r\nexport function fmtDateTime(value) {\r\n  if (value == null || value === "") return "";\r\n  const date = new Date(value);\r\n  if (isNaN(date.getTime())) return String(value);\r\n  return date.toLocaleString("it-IT", {\r\n    day: "2-digit", month: "2-digit", year: "numeric",\r\n    hour: "2-digit", minute: "2-digit",\r\n  });\r\n}\r\n\r\nexport function fmtCell(field, value) {\r\n  if (field.type === "boolean") {\r\n    return value\r\n      ? \'<span class="badge badge-on" title="S\xEC">\u2713</span>\'\r\n      : \'<span class="badge badge-off" title="No">\u2014</span>\';\r\n  }\r\n  if (field.type === "datetime") return escHtml(fmtDateTime(value));\r\n  if (field.type === "id") return `<span class="mono">${escHtml(value ?? "")}</span>`;\r\n  return escHtml(value ?? "");\r\n}\r\n\r\n/** Rende un input con il name corretto, vincolando il contratto con il router. */\r\nexport function fieldInput(field, value) {\r\n  const name = field.name;\r\n  const required = field.required ? " required" : "";\r\n  if (field.type === "boolean") {\r\n    return `<input type="checkbox" name="${name}" value="1"${value ? " checked" : ""} />`;\r\n  }\r\n  const escaped = value == null ? "" : escHtml(String(value));\r\n  if (field.type === "integer") return `<input type="number" name="${name}" value="${escaped}"${required} />`;\r\n  if (field.type === "datetime") return `<input type="datetime-local" name="${name}" value="${escaped}"${required} />`;\r\n  return `<input type="text" name="${name}" value="${escaped}"${required} />`;\r\n}\r\n\r\n/** URL del form, /slug per nuovo e /slug/:id per modifica. */\r\nexport function formAction(entity, row) {\r\n  return row && row.id ? `/${entity.slug}/${escHtml(row.id)}` : `/${entity.slug}`;\r\n}\r\n';
 
 // raw-template:src/templates/views.js
-var views_default = '// ZONA UI, \xE8 l\'unico file modificabile per cambiare presentazione e markup.\n// Non modificare index.js, lib/auth.js, lib/db.js, lib/ui-kit.js, lib/shell.js,\n// config.js o migrations. Le viste sono funzioni pure, ricevono dati e ctx,\n// restituiscono HTML. Usa sempre fieldInput() e formAction() per i form.\nimport { shell } from "./lib/shell.js";\nimport { escHtml, humanize, fmtCell, fieldInput, formAction } from "./lib/ui-kit.js";\n\nconst EMPTY_GLYPH = \'<svg class="empty-glyph" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13l3-8h12l3 8"/><path d="M3 13v6h18v-6"/><path d="M3 13h5l2 3h4l2-3h5"/></svg>\';\n\nexport function renderStyles() {\n  return `\n    :root {\n      --accent: #0f766e; --accent-strong: #0a5d56; --accent-soft: #e3efed;\n      --bg: #f6f5f1; --surface: #ffffff; --line: #e7e4dd; --line-soft: #f0eee8;\n      --ink: #26241f; --ink-soft: #6f6a5f;\n      --danger: #a8362c; --danger-soft: #f8edec; --danger-line: #e6cdca;\n      --radius: 10px;\n    }\n    *, *::before, *::after { box-sizing: border-box; }\n    html { -webkit-text-size-adjust: 100%; }\n    body { margin: 0; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.5;\n      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif; }\n    a { color: var(--accent); }\n    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }\n    .topbar { background: var(--surface); border-bottom: 1px solid var(--line); }\n    .topbar-inner { max-width: 1040px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }\n    .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 650; letter-spacing: -0.01em; }\n    .brand-mark { width: 10px; height: 10px; border-radius: 3px; background: var(--accent); flex: none; }\n    .topbar nav { display: flex; gap: 4px; flex-wrap: wrap; }\n    .topbar nav a { color: var(--ink-soft); text-decoration: none; font-size: 14px; font-weight: 500; padding: 6px 10px; border-radius: 7px; }\n    .topbar nav a:hover { color: var(--ink); background: var(--line-soft); }\n    .topbar nav a.active { color: var(--accent-strong); background: var(--accent-soft); }\n    main { max-width: 1040px; margin: 40px auto 0; padding: 0 24px; }\n    .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }\n    h1 { font-size: 24px; font-weight: 650; letter-spacing: -0.015em; margin: 0; }\n    .page-sub { margin: 4px 0 0; color: var(--ink-soft); font-size: 14px; }\n    .eyebrow { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }\n    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 1px 2px rgba(38, 36, 31, 0.05); }\n    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1px solid transparent; font: inherit; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; }\n    .btn-primary { background: var(--accent); color: #fff; }\n    .btn-primary:hover { background: var(--accent-strong); }\n    .btn-ghost { background: transparent; border-color: var(--line); color: var(--ink); }\n    .btn-ghost:hover { background: var(--line-soft); }\n    .btn-danger { background: var(--surface); border-color: var(--danger-line); color: var(--danger); }\n    .btn-danger:hover { background: var(--danger-soft); }\n    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }\n    .stat-card { padding: 20px; display: flex; flex-direction: column; }\n    .stat-value { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-top: 8px; }\n    .stat-sub { color: var(--ink-soft); font-size: 13px; }\n    .stat-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line-soft); font-size: 13px; font-weight: 600; }\n    .stat-actions a { text-decoration: none; color: var(--accent-strong); }\n    .stat-actions a:hover { text-decoration: underline; }\n    .table-card { overflow-x: auto; }\n    table { width: 100%; border-collapse: collapse; font-size: 14px; }\n    th { text-align: left; font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-soft); background: #fbfaf7; padding: 10px 16px; border-bottom: 1px solid var(--line); white-space: nowrap; }\n    td { padding: 12px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }\n    tbody tr:last-child td { border-bottom: none; }\n    tbody tr:hover td { background: #faf9f5; }\n    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color: var(--ink-soft); }\n    .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }\n    .badge-on { background: var(--accent-soft); color: var(--accent-strong); }\n    .badge-off { background: var(--line-soft); color: var(--ink-soft); }\n    .row-link { font-weight: 600; font-size: 13px; text-decoration: none; color: var(--accent-strong); white-space: nowrap; }\n    .row-link:hover { text-decoration: underline; }\n    .empty { text-align: center; padding: 56px 24px; }\n    .empty-glyph { display: block; margin: 0 auto 12px; color: var(--ink-soft); }\n    .empty h2 { font-size: 17px; font-weight: 650; margin: 0 0 4px; }\n    .empty p { color: var(--ink-soft); font-size: 14px; margin: 0 0 20px; }\n    .form-card { max-width: 560px; padding: 24px; }\n    label { display: block; margin-bottom: 16px; }\n    label > span { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }\n    .req { color: var(--danger); font-style: normal; }\n    input[type=text], input[type=password], input[type=number], input[type=date], input[type=datetime-local], textarea, select {\n      width: 100%; padding: 9px 12px; border: 1px solid #d8d4cb; border-radius: 8px; font: inherit; font-size: 14px; background: var(--surface); color: var(--ink); }\n    input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: 2px solid var(--accent-soft); outline-offset: 0; }\n    .check-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }\n    .check-row span { display: inline; margin: 0; font-size: 14px; font-weight: 600; }\n    .check-row input { accent-color: var(--accent); width: 16px; height: 16px; }\n    .error { background: var(--danger-soft); border: 1px solid var(--danger-line); color: var(--danger); padding: 10px 14px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; }\n    .actions { display: flex; align-items: center; gap: 8px; margin-top: 24px; flex-wrap: wrap; }\n    .page-head .actions { margin-top: 0; }\n    .inline-form { display: inline; margin: 0; }\n    .detail-card { padding: 8px 24px; max-width: 720px; }\n    .field-row { padding: 14px 0; border-bottom: 1px solid var(--line-soft); }\n    .field-row:last-child { border-bottom: none; }\n    .field-label { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }\n    .field-value { margin-top: 3px; font-size: 14px; overflow-wrap: anywhere; }\n    .back-row { margin-top: 16px; }\n    .danger-zone { margin-top: 16px; }\n    footer { max-width: 1040px; margin: 48px auto 32px; padding: 16px 24px 0; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: 12.5px; }\n    footer strong { color: var(--ink); font-weight: 600; }\n    @media (max-width: 720px) { main { margin-top: 24px; } .topbar-inner { padding: 10px 16px; gap: 12px; } main, footer { padding-left: 16px; padding-right: 16px; } .page-head { flex-direction: column; align-items: flex-start; } h1 { font-size: 21px; } }\n    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }\n  `;\n}\n\nexport function renderChrome(ctx) {\n  const items = [{ href: "/", label: "Panoramica" }, ...ctx.entities.map((entity) => ({ href: "/" + entity.slug, label: humanize(entity.name) }))];\n  const account = ctx.user\n    ? `<a href="/account/password"${ctx.activePath === "/account/password" ? \' class="active"\' : ""}>Account</a>` +\n      (ctx.isAdmin ? `<a href="/admin/users"${ctx.activePath === "/admin/users" ? \' class="active"\' : ""}>Utenti</a>` : "")\n    : "";\n  const nav = ctx.user ? items.map((item) => `<a href="${escHtml(item.href)}"${item.href === ctx.activePath ? \' class="active"\' : ""}>${escHtml(item.label)}</a>`).join("") + account : "";\n  const userBox = ctx.user ? `<form method="POST" action="/logout" class="inline-form" style="margin-left:auto"><span class="page-sub">${escHtml(ctx.user.email)}</span> <button class="btn btn-ghost" type="submit">Esci</button></form>` : "";\n  return `<header class="topbar"><div class="topbar-inner">\n    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span>${escHtml(ctx.appTitle)}</a>\n    <nav>${nav}</nav>${userBox}\n  </div></header><footer>Creato con <strong>TORA Build</strong></footer>`;\n}\n\nfunction page(title, body, ctx) {\n  return shell(title, body, renderStyles(), renderChrome(ctx));\n}\n\nexport function renderDashboard(counts, ctx) {\n  const cards = ctx.entities.map((entity) => {\n    const count = counts[entity.slug] ?? 0;\n    const actions = `${ctx.can(entity.name, "read") ? `<a href="/${entity.slug}">Vedi tutti</a>` : ""}${ctx.can(entity.name, "create") ? `<a href="/${entity.slug}/new">+ Nuovo</a>` : ""}`;\n    return `<div class="card stat-card"><div class="eyebrow">${escHtml(humanize(entity.name))}</div><div class="stat-value">${escHtml(String(count))}</div><div class="stat-sub">${count === 1 ? "elemento" : "elementi"}</div><div class="stat-actions">${actions}</div></div>`;\n  }).join("");\n  return page(ctx.appTitle + " \u2014 Panoramica", `<div class="page-head"><div><h1>Panoramica</h1><p class="page-sub">Benvenuto in ${escHtml(ctx.appTitle)}. Ecco lo stato dei tuoi dati.</p></div></div><div class="dashboard-grid">${cards}</div>`, ctx);\n}\n\nexport function renderList(entity, rows, ctx) {\n  const columns = [{ name: "id", type: "id" }, { name: "created_at", type: "datetime" }, ...entity.fields];\n  let content;\n  if (rows.length === 0) {\n    content = `<div class="card empty">${EMPTY_GLYPH}<h2>Nessun elemento ancora</h2><p>Quando crei un elemento lo trovi qui, pronto da consultare.</p>${ctx.can(entity.name, "create") ? `<a href="/${entity.slug}/new" class="btn btn-primary">Crea il primo</a>` : ""}</div>`;\n  } else {\n    const headings = columns.map((column) => `<th>${escHtml(humanize(column.name))}</th>`).join("");\n    const body = rows.map((row) => `<tr>${columns.map((column) => `<td>${fmtCell(column, row[column.name])}</td>`).join("")}<td><a href="/${entity.slug}/${escHtml(row.id)}" class="row-link">Apri</a></td></tr>`).join("");\n    content = `<div class="card table-card"><table><thead><tr>${headings}<th></th></tr></thead><tbody>${body}</tbody></table></div>`;\n  }\n  const create = ctx.can(entity.name, "create") ? `<a href="/${entity.slug}/new" class="btn btn-primary">+ Nuovo</a>` : "";\n  return page(humanize(entity.name) + " \u2014 " + ctx.appTitle, `<div class="page-head"><div><div class="eyebrow">Archivio</div><h1>${escHtml(humanize(entity.name))}</h1></div>${create}</div>${content}`, ctx);\n}\n\nexport function renderForm(entity, row, error, ctx) {\n  const editing = row && row.id;\n  const inputs = entity.fields.map((field) => {\n    const label = escHtml(humanize(field.name));\n    if (field.type === "boolean") return `<label class="check-row">${fieldInput(field, row ? row[field.name] : null)}<span>${label}</span></label>`;\n    return `<label><span>${label}${field.required ? \' <em class="req">*</em>\' : ""}</span>${fieldInput(field, row ? row[field.name] : null)}</label>`;\n  }).join("");\n  const message = error ? `<div class="error" role="alert">${escHtml(error)}</div>` : "";\n  const remove = editing && ctx.can(entity.name, "delete") ? `<form method="POST" action="/${entity.slug}/${escHtml(row.id)}/delete" class="danger-zone"><button type="submit" class="btn btn-danger" onclick="return confirm(\'Eliminare questo elemento?\')">Elimina</button></form>` : "";\n  return page((editing ? "Modifica " : "Nuovo ") + humanize(entity.name) + " \u2014 " + ctx.appTitle, `<div class="page-head"><div><div class="eyebrow">${escHtml(humanize(entity.name))}</div><h1>${editing ? "Modifica" : "Nuovo elemento"}</h1></div></div><form method="POST" action="${formAction(entity, row)}" class="card form-card">${message}${inputs}<div class="actions"><button type="submit" class="btn btn-primary">${editing ? "Salva modifiche" : "Crea"}</button><a href="/${entity.slug}" class="btn btn-ghost">Annulla</a></div></form>${remove}`, ctx);\n}\n\nexport function renderDetail(entity, row, ctx) {\n  const fields = [{ name: "id", type: "id" }, { name: "created_at", type: "datetime" }, ...entity.fields];\n  const rows = fields.map((field) => `<div class="field-row"><div class="field-label">${escHtml(humanize(field.name))}</div><div class="field-value">${fmtCell(field, row[field.name])}</div></div>`).join("");\n  const actions = `<div class="actions">${ctx.can(entity.name, "update") ? `<a href="/${entity.slug}/${escHtml(row.id)}/edit" class="btn btn-primary">Modifica</a>` : ""}${ctx.can(entity.name, "delete") ? `<form method="POST" action="/${entity.slug}/${escHtml(row.id)}/delete" class="inline-form"><button type="submit" class="btn btn-danger" onclick="return confirm(\'Eliminare questo elemento?\')">Elimina</button></form>` : ""}</div>`;\n  return page(humanize(entity.name) + " \u2014 " + ctx.appTitle, `<div class="page-head"><div><div class="eyebrow">${escHtml(humanize(entity.name))}</div><h1>Dettaglio</h1></div>${actions}</div><div class="card detail-card">${rows}</div><div class="actions back-row"><a href="/${entity.slug}" class="btn btn-ghost">Torna alla lista</a></div>`, ctx);\n}\n\nexport function renderLogin(error, ctx) {\n  const message = error ? `<div class="error" role="alert">${escHtml(error)}</div>` : "";\n  return page("Accedi \u2014 " + ctx.appTitle, `<div class="page-head"><div><h1>Accedi</h1></div></div><form method="POST" action="/login" class="card form-card">${message}<label><span>Email</span><input type="text" name="email" required /></label><label><span>Password</span><input type="password" name="password" required /></label><div class="actions"><button class="btn btn-primary" type="submit">Entra</button><a class="btn btn-ghost" href="/signup">Registrati</a></div></form>`, ctx);\n}\n\nexport function renderAccountPassword(error, ctx) {\n  const message = error ? `<div class="error" role="alert">${escHtml(error)}</div>` : "";\n  const success = ctx.passwordUpdated ? `<div class="card" role="status" style="padding:10px 14px;margin-bottom:16px">Password aggiornata.</div>` : "";\n  return page("Cambia password \u2014 " + ctx.appTitle, `<div class="page-head"><div><h1>Cambia password</h1></div></div><form method="POST" action="/account/password" class="card form-card">${success}${message}<label><span>Password attuale</span><input type="password" name="current_password" required /></label><label><span>Nuova password (min 10)</span><input type="password" name="new_password" required minlength="10" /></label><div class="actions"><button class="btn btn-primary" type="submit">Aggiorna</button></div></form>`, ctx);\n}\n\nexport function renderUsersList(users, ctx) {\n  const rows = users.map((user) => {\n    const roleOptions = ctx.roles.map((role) => `<option value="${escHtml(role)}"${role === user.role ? " selected" : ""}>${escHtml(role)}</option>`).join("");\n    const remove = user.id === ctx.user.id\n      ? `<span class="page-sub">Account corrente</span>`\n      : `<form method="POST" action="/admin/users/${escHtml(user.id)}/delete" class="inline-form"><button type="submit" class="btn btn-danger" onclick="return confirm(\'Eliminare questo utente?\')">Elimina</button></form>`;\n    return `<tr><td>${escHtml(user.email)}</td><td><form method="POST" action="/admin/users/${escHtml(user.id)}/role" class="inline-form"><select name="role" onchange="this.form.submit()">${roleOptions}</select></form></td><td>${remove}</td></tr>`;\n  }).join("");\n  return page("Utenti \u2014 " + ctx.appTitle, `<div class="page-head"><div><div class="eyebrow">Amministrazione</div><h1>Utenti</h1></div><a href="/admin/users/new" class="btn btn-primary">+ Nuovo utente</a></div><div class="card table-card"><table><thead><tr><th>Email</th><th>Ruolo</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`, ctx);\n}\n\nexport function renderUserForm(error, ctx) {\n  const message = error ? `<div class="error" role="alert">${escHtml(error)}</div>` : "";\n  const roleOptions = ctx.roles.map((role) => `<option value="${escHtml(role)}">${escHtml(role)}</option>`).join("");\n  return page("Nuovo utente \u2014 " + ctx.appTitle, `<div class="page-head"><div><div class="eyebrow">Amministrazione</div><h1>Nuovo utente</h1></div></div><form method="POST" action="/admin/users" class="card form-card">${message}<label><span>Email</span><input type="text" name="email" required /></label><label><span>Password temporanea (min 10)</span><input type="password" name="password" required minlength="10" /></label><label><span>Ruolo</span><select name="role">${roleOptions}</select></label><div class="actions"><button class="btn btn-primary" type="submit">Crea utente</button><a href="/admin/users" class="btn btn-ghost">Annulla</a></div></form>`, ctx);\n}\n\nexport function renderSignup(error, ctx) {\n  const message = error ? `<div class="error" role="alert">${escHtml(error)}</div>` : "";\n  return page("Registrati \u2014 " + ctx.appTitle, `<div class="page-head"><div><h1>Registrati</h1></div></div><form method="POST" action="/signup" class="card form-card">${message}<label><span>Email</span><input type="text" name="email" required /></label><label><span>Password (min 10)</span><input type="password" name="password" required minlength="10" /></label><div class="actions"><button class="btn btn-primary" type="submit">Crea account</button><a class="btn btn-ghost" href="/login">Ho gi\xE0 un account</a></div></form>`, ctx);\n}\n';
+var views_default = '// ZONA UI, \xE8 l\'unico file modificabile per cambiare presentazione e markup.\r\n// Non modificare index.js, lib/auth.js, lib/db.js, lib/ui-kit.js, lib/shell.js,\r\n// config.js o migrations. Le viste sono funzioni pure, ricevono dati e ctx,\r\n// restituiscono HTML. Usa sempre fieldInput() e formAction() per i form.\r\nimport { shell } from "./lib/shell.js";\r\nimport { escHtml, humanize, fmtCell, fieldInput, formAction } from "./lib/ui-kit.js";\r\n\r\nconst EMPTY_GLYPH = \'<svg class="empty-glyph" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13l3-8h12l3 8"/><path d="M3 13v6h18v-6"/><path d="M3 13h5l2 3h4l2-3h5"/></svg>\';\r\n\r\nexport function renderStyles() {\r\n  return `\r\n    :root {\r\n      --accent: #0f766e; --accent-strong: #0a5d56; --accent-soft: #e3efed;\r\n      --bg: #f6f5f1; --surface: #ffffff; --line: #e7e4dd; --line-soft: #f0eee8;\r\n      --ink: #26241f; --ink-soft: #6f6a5f;\r\n      --danger: #a8362c; --danger-soft: #f8edec; --danger-line: #e6cdca;\r\n      --radius: 10px;\r\n    }\r\n    *, *::before, *::after { box-sizing: border-box; }\r\n    html { -webkit-text-size-adjust: 100%; }\r\n    body { margin: 0; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.5;\r\n      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif; }\r\n    a { color: var(--accent); }\r\n    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }\r\n    .topbar { background: var(--surface); border-bottom: 1px solid var(--line); }\r\n    .topbar-inner { max-width: 1040px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }\r\n    .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 650; letter-spacing: -0.01em; }\r\n    .brand-mark { width: 10px; height: 10px; border-radius: 3px; background: var(--accent); flex: none; }\r\n    .topbar nav { display: flex; gap: 4px; flex-wrap: wrap; }\r\n    .topbar nav a { color: var(--ink-soft); text-decoration: none; font-size: 14px; font-weight: 500; padding: 6px 10px; border-radius: 7px; }\r\n    .topbar nav a:hover { color: var(--ink); background: var(--line-soft); }\r\n    .topbar nav a.active { color: var(--accent-strong); background: var(--accent-soft); }\r\n    main { max-width: 1040px; margin: 40px auto 0; padding: 0 24px; }\r\n    .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }\r\n    h1 { font-size: 24px; font-weight: 650; letter-spacing: -0.015em; margin: 0; }\r\n    .page-sub { margin: 4px 0 0; color: var(--ink-soft); font-size: 14px; }\r\n    .eyebrow { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }\r\n    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 1px 2px rgba(38, 36, 31, 0.05); }\r\n    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1px solid transparent; font: inherit; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; }\r\n    .btn-primary { background: var(--accent); color: #fff; }\r\n    .btn-primary:hover { background: var(--accent-strong); }\r\n    .btn-ghost { background: transparent; border-color: var(--line); color: var(--ink); }\r\n    .btn-ghost:hover { background: var(--line-soft); }\r\n    .btn-danger { background: var(--surface); border-color: var(--danger-line); color: var(--danger); }\r\n    .btn-danger:hover { background: var(--danger-soft); }\r\n    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }\r\n    .stat-card { padding: 20px; display: flex; flex-direction: column; }\r\n    .stat-value { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-top: 8px; }\r\n    .stat-sub { color: var(--ink-soft); font-size: 13px; }\r\n    .stat-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line-soft); font-size: 13px; font-weight: 600; }\r\n    .stat-actions a { text-decoration: none; color: var(--accent-strong); }\r\n    .stat-actions a:hover { text-decoration: underline; }\r\n    .table-card { overflow-x: auto; }\r\n    table { width: 100%; border-collapse: collapse; font-size: 14px; }\r\n    th { text-align: left; font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-soft); background: #fbfaf7; padding: 10px 16px; border-bottom: 1px solid var(--line); white-space: nowrap; }\r\n    td { padding: 12px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }\r\n    tbody tr:last-child td { border-bottom: none; }\r\n    tbody tr:hover td { background: #faf9f5; }\r\n    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color: var(--ink-soft); }\r\n    .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }\r\n    .badge-on { background: var(--accent-soft); color: var(--accent-strong); }\r\n    .badge-off { background: var(--line-soft); color: var(--ink-soft); }\r\n    .row-link { font-weight: 600; font-size: 13px; text-decoration: none; color: var(--accent-strong); white-space: nowrap; }\r\n    .row-link:hover { text-decoration: underline; }\r\n    .empty { text-align: center; padding: 56px 24px; }\r\n    .empty-glyph { display: block; margin: 0 auto 12px; color: var(--ink-soft); }\r\n    .empty h2 { font-size: 17px; font-weight: 650; margin: 0 0 4px; }\r\n    .empty p { color: var(--ink-soft); font-size: 14px; margin: 0 0 20px; }\r\n    .form-card { max-width: 560px; padding: 24px; }\r\n    label { display: block; margin-bottom: 16px; }\r\n    label > span { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }\r\n    .req { color: var(--danger); font-style: normal; }\r\n    input[type=text], input[type=password], input[type=number], input[type=date], input[type=datetime-local], textarea, select {\r\n      width: 100%; padding: 9px 12px; border: 1px solid #d8d4cb; border-radius: 8px; font: inherit; font-size: 14px; background: var(--surface); color: var(--ink); }\r\n    input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: 2px solid var(--accent-soft); outline-offset: 0; }\r\n    .check-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }\r\n    .check-row span { display: inline; margin: 0; font-size: 14px; font-weight: 600; }\r\n    .check-row input { accent-color: var(--accent); width: 16px; height: 16px; }\r\n    .error { background: var(--danger-soft); border: 1px solid var(--danger-line); color: var(--danger); padding: 10px 14px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; }\r\n    .actions { display: flex; align-items: center; gap: 8px; margin-top: 24px; flex-wrap: wrap; }\r\n    .page-head .actions { margin-top: 0; }\r\n    .inline-form { display: inline; margin: 0; }\r\n    .detail-card { padding: 8px 24px; max-width: 720px; }\r\n    .field-row { padding: 14px 0; border-bottom: 1px solid var(--line-soft); }\r\n    .field-row:last-child { border-bottom: none; }\r\n    .field-label { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }\r\n    .field-value { margin-top: 3px; font-size: 14px; overflow-wrap: anywhere; }\r\n    .back-row { margin-top: 16px; }\r\n    .danger-zone { margin-top: 16px; }\r\n    footer { max-width: 1040px; margin: 48px auto 32px; padding: 16px 24px 0; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: 12.5px; }\r\n    footer strong { color: var(--ink); font-weight: 600; }\r\n    @media (max-width: 720px) { main { margin-top: 24px; } .topbar-inner { padding: 10px 16px; gap: 12px; } main, footer { padding-left: 16px; padding-right: 16px; } .page-head { flex-direction: column; align-items: flex-start; } h1 { font-size: 21px; } }\r\n    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }\r\n  `;\r\n}\r\n\r\nexport function renderChrome(ctx) {\r\n  const items = [{ href: "/", label: "Panoramica" }, ...ctx.entities.map((entity) => ({ href: "/" + entity.slug, label: humanize(entity.name) }))];\r\n  const account = ctx.user\r\n    ? `<a href="/account/password"${ctx.activePath === "/account/password" ? \' class="active"\' : ""}>Account</a>` +\r\n      (ctx.isAdmin ? `<a href="/admin/users"${ctx.activePath === "/admin/users" ? \' class="active"\' : ""}>Utenti</a>` : "")\r\n    : "";\r\n  const nav = ctx.user ? items.map((item) => `<a href="${escHtml(item.href)}"${item.href === ctx.activePath ? \' class="active"\' : ""}>${escHtml(item.label)}</a>`).join("") + account : "";\r\n  const userBox = ctx.user ? `<form method="POST" action="/logout" class="inline-form" style="margin-left:auto"><span class="page-sub">${escHtml(ctx.user.email)}</span> <button class="btn btn-ghost" type="submit">Esci</button></form>` : "";\r\n  return `<header class="topbar"><div class="topbar-inner">\r\n    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span>${escHtml(ctx.appTitle)}</a>\r\n    <nav>${nav}</nav>${userBox}\r\n  </div></header><footer>Creato con <strong>TORA Build</strong></footer>`;\r\n}\r\n\r\nfunction page(title, body, ctx) {\r\n  return shell(title, body, renderStyles(), renderChrome(ctx));\r\n}\r\n\r\nexport function renderDashboard(counts, ctx) {\r\n  const cards = ctx.entities.map((entity) => {\r\n    const count = counts[entity.slug] ?? 0;\r\n    const actions = `${ctx.can(entity.name, "read") ? `<a href="/${entity.slug}">Vedi tutti</a>` : ""}${ctx.can(entity.name, "create") ? `<a href="/${entity.slug}/new">+ Nuovo</a>` : ""}`;\r\n    return `<div class="card stat-card"><div class="eyebrow">${escHtml(humanize(entity.name))}</div><div class="stat-value">${escHtml(String(count))}</div><div class="stat-sub">${count === 1 ? "elemento" : "elementi"}</div><div class="stat-actions">${actions}</div></div>`;\r\n  }).join("");\r\n  return page(ctx.appTitle + " \u2014 Panoramica", `<div class="page-head"><div><h1>Panoramica</h1><p class="page-sub">Benvenuto in ${escHtml(ctx.appTitle)}. Ecco lo stato dei tuoi dati.</p></div></div><div class="dashboard-grid">${cards}</div>`, ctx);\r\n}\r\n\r\nexport function renderList(entity, rows, ctx) {\r\n  const columns = [{ name: "id", type: "id" }, { name: "created_at", type: "datetime" }, ...entity.fields];\r\n  let content;\r\n  if (rows.length === 0) {\r\n    content = `<div class="card empty">${EMPTY_GLYPH}<h2>Nessun elemento ancora</h2><p>Quando crei un elemento lo trovi qui, pronto da consultare.</p>${ctx.can(entity.name, "create") ? `<a href="/${entity.slug}/new" class="btn btn-primary">Crea il primo</a>` : ""}</div>`;\r\n  } else {\r\n    const headings = columns.map((column) => `<th>${escHtml(humanize(column.name))}</th>`).join("");\r\n    const body = rows.map((row) => `<tr>${columns.map((column) => `<td>${fmtCell(column, row[column.name])}</td>`).join("")}<td><a href="/${entity.slug}/${escHtml(row.id)}" class="row-link">Apri</a></td></tr>`).join("");\r\n    content = `<div class="card table-card"><table><thead><tr>${headings}<th></th></tr></thead><tbody>${body}</tbody></table></div>`;\r\n  }\r\n  const create = ctx.can(entity.name, "create") ? `<a href="/${entity.slug}/new" class="btn btn-primary">+ Nuovo</a>` : "";\r\n  return page(humanize(entity.name) + " \u2014 " + ctx.appTitle, `<div class="page-head"><div><div class="eyebrow">Archivio</div><h1>${escHtml(humanize(entity.name))}</h1></div>${create}</div>${content}`, ctx);\r\n}\r\n\r\nexport function renderForm(entity, row, error, ctx) {\r\n  const editing = row && row.id;\r\n  const inputs = entity.fields.map((field) => {\r\n    const label = escHtml(humanize(field.name));\r\n    if (field.type === "boolean") return `<label class="check-row">${fieldInput(field, row ? row[field.name] : null)}<span>${label}</span></label>`;\r\n    return `<label><span>${label}${field.required ? \' <em class="req">*</em>\' : ""}</span>${fieldInput(field, row ? row[field.name] : null)}</label>`;\r\n  }).join("");\r\n  const message = error ? `<div class="error" role="alert">${escHtml(error)}</div>` : "";\r\n  const remove = editing && ctx.can(entity.name, "delete") ? `<form method="POST" action="/${entity.slug}/${escHtml(row.id)}/delete" class="danger-zone"><button type="submit" class="btn btn-danger" onclick="return confirm(\'Eliminare questo elemento?\')">Elimina</button></form>` : "";\r\n  return page((editing ? "Modifica " : "Nuovo ") + humanize(entity.name) + " \u2014 " + ctx.appTitle, `<div class="page-head"><div><div class="eyebrow">${escHtml(humanize(entity.name))}</div><h1>${editing ? "Modifica" : "Nuovo elemento"}</h1></div></div><form method="POST" action="${formAction(entity, row)}" class="card form-card">${message}${inputs}<div class="actions"><button type="submit" class="btn btn-primary">${editing ? "Salva modifiche" : "Crea"}</button><a href="/${entity.slug}" class="btn btn-ghost">Annulla</a></div></form>${remove}`, ctx);\r\n}\r\n\r\nexport function renderDetail(entity, row, ctx) {\r\n  const fields = [{ name: "id", type: "id" }, { name: "created_at", type: "datetime" }, ...entity.fields];\r\n  const rows = fields.map((field) => `<div class="field-row"><div class="field-label">${escHtml(humanize(field.name))}</div><div class="field-value">${fmtCell(field, row[field.name])}</div></div>`).join("");\r\n  const actions = `<div class="actions">${ctx.can(entity.name, "update") ? `<a href="/${entity.slug}/${escHtml(row.id)}/edit" class="btn btn-primary">Modifica</a>` : ""}${ctx.can(entity.name, "delete") ? `<form method="POST" action="/${entity.slug}/${escHtml(row.id)}/delete" class="inline-form"><button type="submit" class="btn btn-danger" onclick="return confirm(\'Eliminare questo elemento?\')">Elimina</button></form>` : ""}</div>`;\r\n  return page(humanize(entity.name) + " \u2014 " + ctx.appTitle, `<div class="page-head"><div><div class="eyebrow">${escHtml(humanize(entity.name))}</div><h1>Dettaglio</h1></div>${actions}</div><div class="card detail-card">${rows}</div><div class="actions back-row"><a href="/${entity.slug}" class="btn btn-ghost">Torna alla lista</a></div>`, ctx);\r\n}\r\n\r\nexport function renderLogin(error, ctx) {\r\n  const message = error ? `<div class="error" role="alert">${escHtml(error)}</div>` : "";\r\n  return page("Accedi \u2014 " + ctx.appTitle, `<div class="page-head"><div><h1>Accedi</h1></div></div><form method="POST" action="/login" class="card form-card">${message}<label><span>Email</span><input type="text" name="email" required /></label><label><span>Password</span><input type="password" name="password" required /></label><div class="actions"><button class="btn btn-primary" type="submit">Entra</button><a class="btn btn-ghost" href="/signup">Registrati</a></div></form>`, ctx);\r\n}\r\n\r\nexport function renderAccountPassword(error, ctx) {\r\n  const message = error ? `<div class="error" role="alert">${escHtml(error)}</div>` : "";\r\n  const success = ctx.passwordUpdated ? `<div class="card" role="status" style="padding:10px 14px;margin-bottom:16px">Password aggiornata.</div>` : "";\r\n  return page("Cambia password \u2014 " + ctx.appTitle, `<div class="page-head"><div><h1>Cambia password</h1></div></div><form method="POST" action="/account/password" class="card form-card">${success}${message}<label><span>Password attuale</span><input type="password" name="current_password" required /></label><label><span>Nuova password (min 10)</span><input type="password" name="new_password" required minlength="10" /></label><div class="actions"><button class="btn btn-primary" type="submit">Aggiorna</button></div></form>`, ctx);\r\n}\r\n\r\nexport function renderUsersList(users, ctx) {\r\n  const rows = users.map((user) => {\r\n    const roleOptions = ctx.roles.map((role) => `<option value="${escHtml(role)}"${role === user.role ? " selected" : ""}>${escHtml(role)}</option>`).join("");\r\n    const remove = user.id === ctx.user.id\r\n      ? `<span class="page-sub">Account corrente</span>`\r\n      : `<form method="POST" action="/admin/users/${escHtml(user.id)}/delete" class="inline-form"><button type="submit" class="btn btn-danger" onclick="return confirm(\'Eliminare questo utente?\')">Elimina</button></form>`;\r\n    return `<tr><td>${escHtml(user.email)}</td><td><form method="POST" action="/admin/users/${escHtml(user.id)}/role" class="inline-form"><select name="role" onchange="this.form.submit()">${roleOptions}</select></form></td><td>${remove}</td></tr>`;\r\n  }).join("");\r\n  return page("Utenti \u2014 " + ctx.appTitle, `<div class="page-head"><div><div class="eyebrow">Amministrazione</div><h1>Utenti</h1></div><a href="/admin/users/new" class="btn btn-primary">+ Nuovo utente</a></div><div class="card table-card"><table><thead><tr><th>Email</th><th>Ruolo</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`, ctx);\r\n}\r\n\r\nexport function renderUserForm(error, ctx) {\r\n  const message = error ? `<div class="error" role="alert">${escHtml(error)}</div>` : "";\r\n  const roleOptions = ctx.roles.map((role) => `<option value="${escHtml(role)}">${escHtml(role)}</option>`).join("");\r\n  return page("Nuovo utente \u2014 " + ctx.appTitle, `<div class="page-head"><div><div class="eyebrow">Amministrazione</div><h1>Nuovo utente</h1></div></div><form method="POST" action="/admin/users" class="card form-card">${message}<label><span>Email</span><input type="text" name="email" required /></label><label><span>Password temporanea (min 10)</span><input type="password" name="password" required minlength="10" /></label><label><span>Ruolo</span><select name="role">${roleOptions}</select></label><div class="actions"><button class="btn btn-primary" type="submit">Crea utente</button><a href="/admin/users" class="btn btn-ghost">Annulla</a></div></form>`, ctx);\r\n}\r\n\r\nexport function renderSignup(error, ctx) {\r\n  const message = error ? `<div class="error" role="alert">${escHtml(error)}</div>` : "";\r\n  return page("Registrati \u2014 " + ctx.appTitle, `<div class="page-head"><div><h1>Registrati</h1></div></div><form method="POST" action="/signup" class="card form-card">${message}<label><span>Email</span><input type="text" name="email" required /></label><label><span>Password (min 10)</span><input type="password" name="password" required minlength="10" /></label><div class="actions"><button class="btn btn-primary" type="submit">Crea account</button><a class="btn btn-ghost" href="/login">Ho gi\xE0 un account</a></div></form>`, ctx);\r\n}\r\n';
 
 // src/generate.ts
 var SAFE_IDENT = /^[A-Za-z][A-Za-z0-9_]{0,63}$/;

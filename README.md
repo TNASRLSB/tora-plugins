@@ -1,4 +1,4 @@
-# TORA Build plugin for Claude Code
+# Tora-Deployer plugin for Claude Code
 
 Porta un progetto al deploy su TORA Cloud direttamente da Claude Code. Due percorsi:
 **sito statico esistente** (Astro/Vite/HTML) e **app gestionale CRUD da zero** (generata da una
@@ -8,10 +8,23 @@ che pubblica un Worker su TORA Cloud e restituisce l'URL pubblico.
 ## Status
 
 MVP completo: generazione locale, anteprima locale, e **deploy in produzione live**.
-Backend di deploy attivo su `https://mcp.toranoai.com/mcp`. Non ancora pubblicato su marketplace pubblici.
+Backend di deploy attivo su `https://mcp.toranoai.com/mcp`. Pubblicato sul marketplace
+pubblico `TNASRLSB/tora-plugins` (installazione via `/plugin marketplace add`).
 
-Skill implementate: `hello`, `start`, `generate`, `preview`, `preview-stop`,
-`start-deploy`, `deploy-static`, `deploy-crud`.
+Skill implementate: `hello`, `start`, `start-deploy`, `deploy-crud`, `deploy-static`,
+`preview`, `preview-stop`.
+
+## Install: utente (marketplace pubblico)
+
+Dentro Claude Code:
+
+```
+/plugin marketplace add TNASRLSB/tora-plugins
+/plugin install tora-deployer@tora-plugins
+/reload-plugins
+```
+
+Poi verifica con `/tora-deployer:hello`.
 
 ## Install: sviluppo locale
 
@@ -39,7 +52,7 @@ Poi apri Claude Code in qualsiasi cartella e usa le skill qui sotto.
 
 Il deploy in produzione richiede un account TORA. Il server MCP usa **OAuth 2.0 PKCE**:
 al primo deploy Claude Code apre il login nel browser, senza token da incollare a mano.
-(In alternativa, per test, è supportato un Bearer token statico `TORA_MCP_TOKEN` lato server.)
+Solo le email dei domini TORA (`@acmsolution.it`, `@toranoai.com`) sono ammesse.
 
 L'**anteprima locale** è gratuita e non richiede login.
 
@@ -101,8 +114,8 @@ plugins/claude-code/tora-deployer/tests/fixtures/spec.invalid.json
 ```
 
 Tipi di campo: `text`, `integer`, `boolean`, `datetime`, `reference`. I ruoli marcano
-esattamente un `is_admin` e un `is_default`; `auth.admin_email` è opzionale. (`auth.type`
-resta `magic-link` per validare lo schema, ma il runtime è email+password.)
+esattamente un `is_admin` e un `is_default`; `auth.admin_email` è opzionale. `auth.type`
+vale `"password"` (unica modalità): login email+password.
 
 ## Binari del generatore
 
