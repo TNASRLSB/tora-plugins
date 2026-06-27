@@ -71,15 +71,15 @@ the administrator email, then create the admin seed using the role marked `is_ad
 ```
 node ${CLAUDE_PLUGIN_ROOT}/bin/tora-seed-admin.mjs <admin-email> <ADMIN_ROLE>
 ```
-Read the stdout JSON `{ ok, password, sql }`. Keep `sql` for step 8. Give the `password`
-(and email) to the user — it is the admin's first login; they can change it at
-`/account/password` once inside.
+Read the stdout JSON `{ ok, password, sql }`. Keep `sql` for step 8 (it is the admin
+`INSERT`). Give the `password` (and email) to the user — it is the admin's first login;
+they can change it at `/account/password` once inside.
 
 ### 8. Deploy
-Build the migration to apply in production by appending the admin seed to the schema:
-`migrationSql` = contents of `<slug>-dist/migrations/0000_init.sql` + a newline + the `sql`
-from step 7. Do NOT modify the on-disk migration file (that would have failed the guard) —
-append only here, in memory.
+The schema and the admin seed travel in SEPARATE fields — do NOT concatenate them.
+`migrationSql` accepts only `CREATE TABLE`/`CREATE INDEX` (additive DDL); the admin `INSERT`
+goes in its own `seedSql` field (deploy-core applies it to the D1 right after the schema).
+Concatenating the `INSERT` into `migrationSql` is rejected with HTTP 400.
 
 Call MCP tool `deploy_to_tora_cloud`:
 ```
@@ -88,7 +88,8 @@ Call MCP tool `deploy_to_tora_cloud`:
   uploadId,
   options: {
     needsDb: true,
-    migrationSql: <schema + "\n" + admin seed sql>,
+    migrationSql: <contents of <slug>-dist/migrations/0000_init.sql>,
+    seedSql: <admin seed `sql` from step 7>,
     specJson: <serialized spec.json>
   }
 }
@@ -98,7 +99,8 @@ Show the returned public URL, plus the admin email + password from step 7.
 ## Red flags — STOP
 - About to edit `index.js`/`auth.js`/`db.js`/`ui-kit.js`/`shell.js`/`config.js`/migration → don't; only `views.js`.
 - Tempted to skip the integrity guard "because it's probably fine" → run it; it is mandatory.
-- Writing the admin seed INTO `migrations/0000_init.sql` on disk → don't; append only to the in-memory `migrationSql` at step 8, after the guard.
+- Writing the admin seed INTO `migrations/0000_init.sql` on disk → don't; pass it as the separate `seedSql` option at step 8.
+- Concatenating the admin `INSERT` into `migrationSql` → don't; it is rejected (HTTP 400). Use the `seedSql` field.
 - Debugging the login during local preview → stop; it is bypassed by design.
 
 ## Constraints
