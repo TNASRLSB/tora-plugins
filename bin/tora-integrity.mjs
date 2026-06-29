@@ -1016,7 +1016,10 @@ function defaultRole(spec) {
 // raw-template:src/templates/auth.js
 var auth_default = `// Auth helpers per l'app generata \u2014 Web Crypto only, nessuna dipendenza.
 export const SESSION_COOKIE = "__sess";
-export const PBKDF2_ITERATIONS = 150000;
+// Cloudflare Workers' Web Crypto rifiuta PBKDF2 oltre 100000 iterazioni
+// (NotSupportedError: "iteration counts above 100000 are not supported").
+// 100000 \xE8 quindi il massimo utilizzabile nel runtime Workers.
+export const PBKDF2_ITERATIONS = 100000;
 export const PBKDF2_VERSION = 1;
 export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 

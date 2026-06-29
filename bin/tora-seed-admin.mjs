@@ -7,7 +7,7 @@ import process from "node:process";
 import { randomUUID } from "node:crypto";
 
 // src/templates/auth.js
-var PBKDF2_ITERATIONS = 15e4;
+var PBKDF2_ITERATIONS = 1e5;
 var PBKDF2_VERSION = 1;
 var SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1e3;
 var enc = new TextEncoder();
