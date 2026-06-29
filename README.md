@@ -76,9 +76,13 @@ L'**anteprima locale** è gratuita e non richiede login.
                               → anteprima locale (gratis) oppure deploy in produzione
 ```
 
-In produzione l'output viene caricato dall'uploader (`tora-upload.mjs`) e il tool MCP
-`deploy_to_tora_cloud` riceve `{ projectName, uploadId, options }`, pubblica un User Worker e
-restituisce `https://<slug>.toranoai.com`.
+In produzione l'output viene caricato dall'uploader (`tora-upload.mjs`) e i tool MCP
+orchestrano il ciclo cloud:
+
+- `prepare_upload` crea la sessione di upload.
+- `deploy_to_tora_cloud` riceve `{ projectName, uploadId, options }`, pubblica un User Worker e restituisce `https://<slug>.toranoai.com`.
+- `list_projects` mostra i progetti deployati dall'utente autenticato.
+- `delete_project` fa prima una preview; con `confirm: true` cancella Worker e D1 eventuale del progetto dell'utente.
 
 ## App CRUD generata
 
@@ -132,7 +136,8 @@ bin/tora-upload.mjs       impacchetta e carica l'output su R2
 ## Integrazione MCP
 
 Il `.mcp.json` nella directory del plugin punta a `https://mcp.toranoai.com/mcp`, il server
-di deploy live. Il tool esposto è `deploy_to_tora_cloud`.
+di deploy live. I tool principali esposti sono `prepare_upload`, `deploy_to_tora_cloud`,
+`list_projects` e `delete_project`.
 
 ## Layout repository
 

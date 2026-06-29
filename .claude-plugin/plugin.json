@@ -1,7 +1,7 @@
 {
   "name": "tora-deployer",
   "description": "Porta progetti (siti statici e app CRUD) al deploy su TORA Cloud da Claude Code",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "author": {
     "name": "TORA NO AI SRL",
     "email": "build@toranoai.com"

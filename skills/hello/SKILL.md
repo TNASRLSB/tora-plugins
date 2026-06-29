@@ -48,6 +48,10 @@ Starts the local preview (free, not public) and returns the URL.
 `/tora-deployer:preview-stop`
 Stops the local preview server started by `/tora-deployer:preview`.
 
+MCP tools available after login:
+- `list_projects` lists your deployed TORA Cloud projects.
+- `delete_project` first previews what would be removed, then deletes the project when called again with `confirm: true`.
+
 (The CRUD branch — generating and deploying the app — is handled by `deploy-crud`, which
 `start-deploy` runs for you.)
 
