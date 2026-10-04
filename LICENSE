@@ -1,6 +1,40 @@
-Proprietary License
+TUTTI I DIRITTI RISERVATI — ALL RIGHTS RESERVED
 
-Copyright (c) 2026 TORA NO AI SRL.
-All rights reserved.
+Copyright © 2026 Davide Briani. Tutti i diritti riservati.
 
-This plugin and its source code are proprietary and confidential. No permission is granted to use, copy, modify, merge, publish, distribute, sublicense, or sell copies of this software except under a separate written agreement with TORA NO AI SRL.
+1. Titolarità
+Tutto ciò che riguarda il software contenuto in questo repository («tora-plugins») è di titolarità esclusiva di Davide Briani: l'ideazione e il concetto, la progettazione e l'architettura, le specifiche, i prototipi, il codice sorgente e compilato, le interfacce grafiche e il design, la documentazione, i test, gli script, le configurazioni, le procedure di sviluppo, di messa in produzione e di esercizio, il know-how e ogni altra opera dell'ingegno, invenzione o informazione connessa, in ogni versione presente e futura. Davide Briani ne è autore e titolare di tutti i diritti di proprietà intellettuale e industriale, patrimoniali e morali, nella misura massima consentita dalla legge.
+
+2. Nessuna licenza
+Nessuna licenza è concessa, né espressamente né implicitamente. Salvo preventivo consenso scritto di Davide Briani, è vietato usare, copiare, riprodurre, modificare, tradurre, adattare, decompilare, distribuire, pubblicare, concedere in sublicenza, vendere o comunque sfruttare il software o sue parti, crearne opere derivate e usarlo per addestrare o valutare sistemi di intelligenza artificiale.
+
+3. Organizzazione GitHub e accesso
+La presenza del repository nell'organizzazione GitHub «TNASRLSB», intestata a Davide Briani, e l'accesso concesso a collaboratori o a società, compresa TORA NO AI S.R.L. Società Benefit, non comportano alcuna cessione né licenza di diritti. Ogni autorizzazione d'uso risulta soltanto da un atto scritto di Davide Briani ed è revocabile salvo diverso accordo scritto.
+
+4. Componenti di terzi
+Le librerie, i caratteri tipografici e gli altri componenti di terzi inclusi o richiamati restano soggetti alle rispettive licenze.
+
+5. Contributi di Giacomo Sebastiani
+Sono esclusi dalla presente attribuzione i contributi di Giacomo Sebastiani (account GitHub «giacomosebastiani»): il codice e la documentazione di cui risulta autore nella cronologia di questo repository restano di sua titolarità, nei limiti di legge, finché non saranno ceduti per iscritto a Davide Briani. Restano di Davide Briani l'ideazione, la progettazione, le specifiche e ogni altro contributo diverso da quelli di Giacomo Sebastiani.
+
+6. Legge applicabile
+La presente dichiarazione è regolata dalla legge italiana.
+
+Per richieste di autorizzazione: Davide Briani.
+
+-------------------------------------------------------------------------------
+English translation (the Italian text prevails)
+
+Copyright © 2026 Davide Briani. All rights reserved.
+
+1. Ownership. Everything relating to the software in this repository («tora-plugins») belongs exclusively to Davide Briani: its conception and concept, design and architecture, specifications, prototypes, source and compiled code, user interfaces and visual design, documentation, tests, scripts, configurations, development, deployment and operating procedures, know-how and every related work of authorship, invention or information, in every present and future version. Davide Briani is its author and holds all intellectual and industrial property rights, economic and moral, to the fullest extent permitted by law.
+
+2. No licence. No licence is granted, expressly or by implication. Without Davide Briani's prior written consent it is forbidden to use, copy, reproduce, modify, translate, adapt, decompile, distribute, publish, sublicense, sell or otherwise exploit the software or any part of it, to create derivative works, and to use it to train or evaluate artificial-intelligence systems.
+
+3. GitHub organisation and access. The repository being in the GitHub organisation «TNASRLSB», held by Davide Briani, and any access granted to collaborators or companies, including TORA NO AI S.R.L. Società Benefit, do not transfer or license any right. Any permission to use results only from a written instrument signed by Davide Briani and is revocable unless otherwise agreed in writing.
+
+4. Third-party components. Third-party libraries, fonts and other components included or referenced remain subject to their own licences.
+
+5. Contributions by Giacomo Sebastiani. Excluded from this attribution are the contributions of Giacomo Sebastiani (GitHub account «giacomosebastiani»): the code and documentation of which he is the author in this repository's history remain his, within the limits of the law, until assigned in writing to Davide Briani. The conception, design, specifications and every contribution other than Giacomo Sebastiani's remain Davide Briani's.
+
+6. Governing law. This statement is governed by Italian law.
